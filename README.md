@@ -67,3 +67,6 @@ POST -H "API_VERSION: v1" -H "Authorization: JWT 3925ukasjfhad" /meals
 
 returns 201
 ```
+
+
+## Project structure
