@@ -5,7 +5,7 @@ Calendar to track weekly meals during the year.
 
 ## auth
 ```
-POST  -H "API_VERSION: v1" /signup
+POST /signup
 {
     "email": "foo@bar.com",
     "password": "hiddenPassw0rd!"
@@ -13,7 +13,7 @@ POST  -H "API_VERSION: v1" /signup
 ```
 
 ```
-POST -H "API_VERSION: v1" /api/auth
+POST /api/auth
 {
     "email": "foo@bar.com",
     "password": "hiddenPassw0rd!",
@@ -27,7 +27,7 @@ returns
 
 ## meals
 ```
-GET -H "API_VERSION: v1" -H "Authorization: JWT 3925ukasjfhad" /api/meals?start_date="2020-07-20"&end_date="2020-07-27"
+GET -H "Authorization: JWT 3925ukasjfhad" /api/meals?start_date="2020-07-20"&end_date="2020-07-27"
 
 returns
 
@@ -56,7 +56,7 @@ returns
 ```
 
 ```
-POST -H "API_VERSION: v1" -H "Authorization: JWT 3925ukasjfhad" /meals
+POST -H "Authorization: JWT 3925ukasjfhad" /meals
 {
     "date": "2020-07-20",
     "type": "breakfast",
@@ -70,3 +70,18 @@ returns 201
 
 
 ## Project structure
+TBD
+
+## Alembic
+```
+cd server
+make cmd cmd="bash"
+alembic upgrade head
+```
+
+
+# python tests
+```
+cd server
+make tests
+```

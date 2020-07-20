@@ -1,0 +1,9 @@
+alembic
+fastapi
+passlib[bcrypt]
+psycopg2-binary
+pydantic[email]
+pyjwt
+sqlalchemy
+ujson
+uvicorn
