@@ -1,6 +1,8 @@
+import pytest
 from fastapi.testclient import TestClient
 
 
+@pytest.mark.integration
 class TestSignupEndpoint:
 
     def test_signup_returns_200(self, client: TestClient, test_db_session):
