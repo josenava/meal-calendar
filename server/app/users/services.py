@@ -14,11 +14,9 @@ class UserSignupService:
         if existing_user:
             raise UserAlreadyExists
 
-        hashed_password = User.hash_password(signup_data.password)
-        user = User(
+        user = User.create(
             id=self._user_repository.get_next_id(),
             email=signup_data.email,
-            hashed_password=hashed_password,
-            is_active=False
+            plain_password=signup_data.password,
         )
         self._user_repository.save(user)

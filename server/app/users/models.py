@@ -15,6 +15,11 @@ class User(Base):
     is_active = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.now())
 
+    @classmethod
+    def create(cls, id: int, email: str, plain_password: str) -> "User":
+        hashed_password = cls.hash_password(plain_password)
+        return cls(id=id, email=email, hashed_password=hashed_password, is_active=False)
+
     @staticmethod
     def hash_password(password: str) -> str:
         pwd_context = CryptContext(schemes=["bcrypt"])
