@@ -14,6 +14,9 @@ class UserRepository:
     def get_by_email(self, email: str) -> Optional[User]:
         return self._db.query(User).filter(User.email == email).first()
 
+    def get_user_by_token(self, token: str) -> User:
+        pass
+
     def save(self, user: User):
         self._db.add(user)
         self._db.commit()

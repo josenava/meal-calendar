@@ -14,6 +14,7 @@ class TestAuthEndpoint:
         return user
 
     def test_auth_returns_200_and_updates_token(self, client: TestClient, test_db_session, user):
+        # response = client.post("/auth/token", json={})
         pass
 
     def test_auth_with_existing_token_invalidates_previous_one(
