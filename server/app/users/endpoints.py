@@ -1,5 +1,5 @@
 from app.database import get_db
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from .exceptions import UserAlreadyExists
@@ -15,6 +15,8 @@ def create_user(signup_form: SignupForm, response: Response, db: Session = Depen
     try:
         service.execute(signup_form)
     except UserAlreadyExists:
-        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        return {}
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="User alredy exists"
+        )
     return {}

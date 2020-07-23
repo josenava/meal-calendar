@@ -30,4 +30,4 @@ class User(Base):
 
     def verify_password(self, plain_password: str) -> bool:
         pwd_context = CryptContext(schemes=["bcrypt"])
-        return pwd_context.hash(plain_password) == self.password_hash
+        return pwd_context.verify(plain_password, self.hashed_password)

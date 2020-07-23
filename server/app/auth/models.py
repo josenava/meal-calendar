@@ -1,6 +1,9 @@
+from datetime import datetime
+import hashlib
+
+from app.database import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from app.database import Base
 
 
 class AuthUser(Base):
@@ -14,3 +17,15 @@ class AuthUser(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="auth", lazy="joined")
+
+    @classmethod
+    def create(cls, token: str, expires_at: datetime) -> 'AuthUser':
+        return cls(
+            token=token,
+            expires_at=expires_at,
+            token_hash=cls.hash_token(token),
+        )
+
+    @staticmethod
+    def hash_token(token: str) -> str:
+        return hashlib.md5(token.encode()).hexdigest()
