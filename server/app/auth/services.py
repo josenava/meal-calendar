@@ -18,8 +18,8 @@ class AuthUserService:
         self._user_repository = user_repository
 
     def create_access_token(self, email: str) -> AuthToken:
-        expire = datetime.utcnow() + timedelta(self.ACCESS_TOKEN_EXPIRE_MINUTES)
-        data = {"sub": email, "exp": expire.strftime("%Y-%m-%dT%H:%M:%S")}
+        expire = datetime.utcnow() + timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
+        data = {"sub": email, "exp": expire}
         encoded_jwt = jwt.encode(data, SECRET_KEY, algorithm=AUTH_ALGORITHM)
 
         return AuthToken(encoded_jwt, expire)
@@ -37,8 +37,8 @@ class AuthUserService:
         if email is None:
             raise WrongCredentials
         try:
-            expires_at = datetime.strptime(expires, "%Y-%m-%dT%H:%M:%S")
-        except ValueError:
+            expires_at = datetime.fromtimestamp(expires)
+        except Exception:
             raise WrongCredentials
         if expires_at < datetime.utcnow():
             raise WrongCredentials
@@ -47,7 +47,6 @@ class AuthUserService:
 
     def authenticate(self, email: str, plain_password: str) -> str:
         user = self._user_repository.get_by_email(email)
-        print(user.email)
         if user is None or not user.verify_password(plain_password):
             raise WrongCredentials
 
@@ -63,5 +62,5 @@ class AuthUserService:
 
         return auth_token.token
 
-    def unauthenticate(self):
-        pass
+    def unauthenticate(self, user: User) -> None:
+        self._user_repository.delete_auth(user.auth)

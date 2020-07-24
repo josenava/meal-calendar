@@ -16,10 +16,14 @@ class UserRepository:
         return self._db.query(User).filter(User.email == email).first()
 
     def get_user_by_token(self, token: str) -> Optional[User]:
-        auth_user = self._db.query(AuthUser).filter(AuthUser.token_hash == hash(token)).first()
+        auth_user = self._db.query(AuthUser).filter(AuthUser.token_hash == AuthUser.hash_token(token)).first()
         if not auth_user:
             return None
         return auth_user.user
+
+    def delete_auth(self, auth: AuthUser):
+        self._db.delete(auth)
+        self._db.commit()
 
     def save(self, user: User, is_update: bool = False):
         if not is_update:
