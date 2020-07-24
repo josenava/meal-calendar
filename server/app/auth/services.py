@@ -26,21 +26,9 @@ class AuthUserService:
 
     def get_user_from_token(self, token: str) -> Optional[User]:
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[AUTH_ALGORITHM])
+            jwt.decode(token, SECRET_KEY, algorithms=[AUTH_ALGORITHM])
         except JWTError:
-            raise WrongCredentials
-
-        email: Optional[str] = payload.get("sub")
-        expires: Optional[str] = payload.get("exp")
-
-        # TODO move this to a class with its own validation
-        if email is None:
-            raise WrongCredentials
-        try:
-            expires_at = datetime.fromtimestamp(expires)
-        except Exception:
-            raise WrongCredentials
-        if expires_at < datetime.utcnow():
+            # This error also includes expired signature and missing email
             raise WrongCredentials
 
         return self._user_repository.get_user_by_token(token)
