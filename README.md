@@ -2,28 +2,12 @@
 Calendar to track weekly meals during the year.
 
 # API
-
-## auth
 ```
-POST /signup
-{
-    "email": "foo@bar.com",
-    "password": "hiddenPassw0rd!"
-}
+cd server
+docker-compose up
+open http://localhost:8000/docs
 ```
 
-```
-POST /api/auth
-{
-    "email": "foo@bar.com",
-    "password": "hiddenPassw0rd!",
-}
-
-returns
-{
-    "bearer": "JWT 3925ukasjfhad"
-}
-```
 
 ## meals
 ```
