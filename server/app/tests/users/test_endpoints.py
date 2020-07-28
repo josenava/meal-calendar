@@ -3,9 +3,9 @@ from fastapi.testclient import TestClient
 
 
 @pytest.mark.integration
+@pytest.mark.usefixtures("test_db_session")
 class TestSignupEndpoint:
-
-    def test_signup_returns_200(self, client: TestClient, test_db_session):
+    def test_signup_returns_200(self, client: TestClient):
         response = client.post(
             "/signup",
             json={
@@ -16,7 +16,7 @@ class TestSignupEndpoint:
 
         assert response.status_code == 201
 
-    def test_signup_existing_user_returns_422(self, client: TestClient, test_db_session):
+    def test_signup_existing_user_returns_422(self, client: TestClient):
         response = client.post(
             "/signup",
             json={

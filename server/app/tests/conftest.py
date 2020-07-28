@@ -8,6 +8,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
+from app.users.models import User
+
+
 SQLALCHEMY_DATABASE_URL = os.environ.get("POSTGRES_URL_TEST", "")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
@@ -26,11 +29,10 @@ def get_test_db():
 @pytest.fixture(scope="session", autouse=True)
 def create_test_database():
     """
-  Create a clean database on every test case.
-
-  We use the `sqlalchemy_utils` package here for a few helpers in consistently
-  creating and dropping the database.
-  """
+    Create a clean database on every test case.
+    We use the `sqlalchemy_utils` package here for a few helpers in consistently
+    creating and dropping the database.
+    """
     if database_exists(SQLALCHEMY_DATABASE_URL):
         drop_database(SQLALCHEMY_DATABASE_URL)
     create_database(SQLALCHEMY_DATABASE_URL)  # Create the test database.
@@ -40,7 +42,7 @@ def create_test_database():
     drop_database(SQLALCHEMY_DATABASE_URL)  # Drop the test database.
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def test_db_session():
     """Returns an sqlalchemy session, and after the test tears down everything properly."""
 
@@ -59,3 +61,12 @@ def test_db_session():
 def client():
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def user(test_db_session) -> User:
+    user = User.create(id=1, email="hey@bar.com", plain_password="test1234")
+    test_db_session.add(user)
+    test_db_session.commit()
+
+    return user
