@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 class TestSignupEndpoint:
     def test_signup_returns_200(self, client: TestClient):
         response = client.post(
-            "/signup",
+            "/users/signup",
             json={
                 "email": "foo@bar.com",
                 "password": "whatAsecretP1"
@@ -18,7 +18,7 @@ class TestSignupEndpoint:
 
     def test_signup_existing_user_returns_422(self, client: TestClient):
         response = client.post(
-            "/signup",
+            "/users/signup",
             json={
                 "email": "foo@bar.com",
                 "password": "whatAsecretP1"
@@ -28,7 +28,7 @@ class TestSignupEndpoint:
         assert response.status_code == 201
 
         response_2 = client.post(
-            "/signup",
+            "/users/signup",
             json={
                 "email": "foo@bar.com",
                 "password": "whatAsecretP1"

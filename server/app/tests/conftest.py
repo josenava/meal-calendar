@@ -1,4 +1,5 @@
 import os
+from unittest.mock import Mock
 
 import pytest
 from app.database import Base, get_db
@@ -9,6 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from app.users.models import User
+from app.auth.models import AuthUser
+from app.auth.services import AuthUserService
 
 
 SQLALCHEMY_DATABASE_URL = os.environ.get("POSTGRES_URL_TEST", "")
@@ -70,3 +73,15 @@ def user(test_db_session) -> User:
     test_db_session.commit()
 
     return user
+
+
+@pytest.fixture
+def auth_user(test_db_session, user: User) -> AuthUser:
+    service = AuthUserService(Mock())
+    auth_token = service.create_access_token(user.email)
+    auth_user = AuthUser.create(auth_token.token, auth_token.expires_at)
+    user.auth = auth_user
+    test_db_session.add(user)
+    test_db_session.commit()
+
+    return auth_user
