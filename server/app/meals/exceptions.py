@@ -1,0 +1,2 @@
+class MealAlreadyExists(Exception):
+    pass

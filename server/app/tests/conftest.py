@@ -9,8 +9,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
+# models need to be imported for sqlalchemy to work properly
 from app.users.models import User
 from app.auth.models import AuthUser
+from app.meals.models import Meal
+
 from app.auth.services import AuthUserService
 
 
