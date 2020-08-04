@@ -1,3 +1,4 @@
+from uuid import UUID
 from app.database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -27,3 +28,12 @@ def create_meal(
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     return meal
+
+
+@router.put("/{meal_id}")
+def update_meal(
+        meal_id: UUID,
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+):
+    return {'id': meal_id}

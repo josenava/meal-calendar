@@ -4,10 +4,10 @@ from fastapi.testclient import TestClient
 
 from app.auth.models import AuthUser
 from app.meals.enums import MealType
+from app.meals.models import Meal
 
 
 @pytest.mark.integration
-@pytest.mark.usefixtures("test_db_session")
 class TestCreateMealEndpoint:
     @pytest.fixture
     def meal_data(self) -> Dict[str, Any]:
@@ -44,3 +44,15 @@ class TestCreateMealEndpoint:
         )
 
         assert response_2.status_code == 422
+
+
+@pytest.mark.integration
+class TestUpdateMealEndpoint:
+    def test_meal_gets_properly_updated(self, client: TestClient, auth_user: AuthUser, meal: Meal):
+        response = client.put(
+            f"/meals/{meal.id}",
+            json={},
+            headers={"Authorization": f'Bearer {auth_user.token}'}
+        )
+
+        assert response.status_code == 200

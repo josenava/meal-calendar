@@ -1,12 +1,13 @@
 import os
 from unittest.mock import Mock
+from datetime import datetime
 
 import pytest
 from app.database import Base, get_db
 from app.main import app
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 # models need to be imported for sqlalchemy to work properly
@@ -54,13 +55,13 @@ def test_db_session():
 
     SessionLocal = sessionmaker(bind=engine)
 
-    db = SessionLocal()
-    yield db
+    session: Session = SessionLocal()
+    yield session
     # Drop all data after each test
     for tbl in reversed(Base.metadata.sorted_tables):
         engine.execute(tbl.delete())
     # put back the connection to the connection pool
-    db.close()
+    session.close()
 
 
 @pytest.fixture(scope="module")
@@ -88,3 +89,13 @@ def auth_user(test_db_session, user: User) -> AuthUser:
     test_db_session.commit()
 
     return auth_user
+
+
+@pytest.fixture
+def meal(test_db_session: Session, user: User) -> Meal:
+    meal = Meal.create(user_id=user.id, type=1, title="test meal",
+                       date=datetime.strptime("2020-08-04", "%Y-%m-%d"))
+    test_db_session.add(meal)
+    test_db_session.commit()
+
+    return meal
