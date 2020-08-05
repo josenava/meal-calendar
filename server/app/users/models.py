@@ -17,6 +17,7 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
 
     auth = relationship("AuthUser", uselist=False, back_populates="user")
+    meals = relationship("Meal", cascade="all, delete")
 
     @classmethod
     def create(cls, id: int, email: str, plain_password: str) -> "User":
