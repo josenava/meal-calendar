@@ -1,3 +1,5 @@
+from typing import List
+from datetime import date
 from uuid import UUID
 from app.users.models import User
 
@@ -57,3 +59,13 @@ class DeleteMealService:
             raise ActionNotAllowed
 
         self._meal_repository.delete(meal)
+
+
+class GetMealsService:
+    def __init__(self, meal_repository: MealRepository):
+        self._meal_repository = meal_repository
+
+    def execute(self, user_id: int, start_date: date, end_date: date) -> List[Meal]:
+        meals = self._meal_repository.get_by_user_id_and_date(user_id, start_date, end_date)
+
+        return meals

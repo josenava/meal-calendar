@@ -1,4 +1,5 @@
-from typing import Optional
+from datetime import date
+from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -13,6 +14,12 @@ class MealRepository:
 
     def get_by_id(self, meal_id: UUID) -> Optional[Meal]:
         return self._db_session.query(Meal).get(meal_id)
+
+    def get_by_user_id_and_date(self, user_id: int, start_date: date, end_date: date) -> List[Meal]:
+        return self._db_session.query(Meal).filter(
+            Meal.user_id == user_id,
+            Meal.date >= start_date, Meal.date <= end_date,
+        ).all()
 
     def save(self, meal: Meal, is_update: bool = False):
         try:
