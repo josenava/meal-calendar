@@ -32,7 +32,7 @@ class UpdateMealService:
     def __init__(self, meal_repository: MealRepository):
         self._meal_repository = meal_repository
 
-    def execute(self, meal_request: UpdateMealRequest, user_id: int) -> Meal:
+    def execute(self, meal_request: UpdateMealRequest, user_id: int) -> None:
         meal = self._meal_repository.get_by_id(meal_request.id)
         if meal is None:
             raise MealNotFound
@@ -50,7 +50,7 @@ class DeleteMealService:
     def __init__(self, meal_repository: MealRepository):
         self._meal_repository = meal_repository
 
-    def execute(self, meal_id: UUID, user_id: int):
+    def execute(self, meal_id: UUID, user_id: int) -> None:
         meal = self._meal_repository.get_by_id(meal_id)
         if meal is None:
             raise MealNotFound
