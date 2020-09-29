@@ -68,7 +68,7 @@ const Signup = (props) => {
         (response) => {
           setMessage(response.data.message)
           setSuccessful(true)
-          // TODO redirect to /login
+          props.history.push('/')
         },
         (error) => {
           const resMessage =

@@ -10,14 +10,14 @@ const register = (email, password) => {
   })
 }
 
-const login = (username, password) => {
+const signin = (email, password) => {
+  const params = new URLSearchParams()
+  params.append('username', email)
+  params.append('password', password)
   return axios
-    .post(AUTH_API_URL + 'signin', {
-      username,
-      password
-    })
+    .post(AUTH_API_URL + 'token', params)
     .then((response) => {
-      if (response.data.accessToken) {
+      if (response.data.access_token) {
         localStorage.setItem('user', JSON.stringify(response.data))
       }
 
@@ -36,7 +36,7 @@ const getCurrentUser = () => {
 
 export default {
   register,
-  login,
+  signin,
   logout,
   getCurrentUser
 }

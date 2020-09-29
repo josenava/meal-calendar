@@ -1,6 +1,8 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Signup from './components/Signup/Signup'
+import Signin from './components/Signin/Signin'
+import MealCalendar from './components/MealCalendar/MealCalendar'
 
 import {
   BrowserRouter as Router,
@@ -9,24 +11,22 @@ import {
   Link
 } from 'react-router-dom'
 
-function App () {
+const App = () => {
   return (
     <Router>
       <Switch>
-        <Route exact={true} path="/">
-          <Home/>
-        </Route>
-        <Route path="/signup">
-          <Signup />
-        </Route>
+        <Route exact={true} path="/" component={Home} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/meals" component={MealCalendar} />
       </Switch>
     </Router>
   )
 }
 
-function Home () {
+const Home = (props) => {
   return (
     <div className="App">
+      <Signin {...props} />
       <p><Link to="/signup">Signup here</Link></p>
     </div>
   )
