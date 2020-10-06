@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import Signup from './components/Signup/Signup'
+import Signin from './components/Signin/Signin'
+import MealCalendar from './components/MealCalendar/MealCalendar'
 
-function App() {
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from 'react-router-dom'
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Change <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router>
+      <Switch>
+        <Route exact={true} path="/" component={Home} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/meals" component={MealCalendar} />
+      </Switch>
+    </Router>
+  )
 }
 
-export default App;
+const Home = (props) => {
+  return (
+    <div className="App">
+      <Signin {...props} />
+      <p><Link to="/signup">Signup here</Link></p>
+    </div>
+  )
+}
+
+export default App

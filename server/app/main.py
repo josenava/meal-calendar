@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -7,11 +8,16 @@ from .users.endpoints import router as users_router
 from .auth.endpoints import router as auth_router
 from .meals.endpoints import router as meals_router
 
+origins = [
+    "http://localhost:3000"
+]
 
 app = FastAPI()
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(meals_router, prefix="/meals", tags=["meals"])
+
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.exception_handler(RequestValidationError)
