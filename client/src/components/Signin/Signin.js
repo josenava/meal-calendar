@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import PropTypes from 'prop-types'
 import Form from 'react-validation/build/form'
 import Input from 'react-validation/build/input'
 import CheckButton from 'react-validation/build/button'
@@ -15,7 +16,7 @@ const required = (value) => {
   }
 }
 
-const Signin = (props) => {
+const Signin = ({ history }) => {
   const form = useRef()
   const checkBtn = useRef()
 
@@ -44,9 +45,8 @@ const Signin = (props) => {
 
     if (checkBtn.current.context._errors.length === 0) {
       AuthService.signin(email, password).then(
-        (response) => {
-          props.history.push('/meals')
-          window.location.reload()
+        () => {
+          history.push('/meals')
         },
         (error) => {
           const resMessage =
@@ -113,6 +113,10 @@ const Signin = (props) => {
       </div>
     </div>
   )
+}
+
+Signin.propTypes = {
+  history: PropTypes.object.isRequired
 }
 
 export default Signin

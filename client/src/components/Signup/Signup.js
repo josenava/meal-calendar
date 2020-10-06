@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import PropTypes from 'prop-types'
 import Form from 'react-validation/build/form'
 import Input from 'react-validation/build/input'
 import CheckButton from 'react-validation/build/button'
@@ -36,7 +37,7 @@ const validPassword = (value) => {
   }
 }
 
-const Signup = (props) => {
+const Signup = ({ history }) => {
   const form = useRef()
   const checkBtn = useRef()
 
@@ -68,7 +69,7 @@ const Signup = (props) => {
         (response) => {
           setMessage(response.data.message)
           setSuccessful(true)
-          props.history.push('/')
+          history.push('/')
         },
         (error) => {
           const resMessage =
@@ -135,6 +136,10 @@ const Signup = (props) => {
       </div>
     </div>
   )
+}
+
+Signup.propTypes = {
+  history: PropTypes.object.isRequired
 }
 
 export default Signup

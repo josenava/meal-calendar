@@ -26,17 +26,33 @@ const signin = (email, password) => {
 }
 
 const logout = () => {
-  // TODO api call to delete token in the server
   localStorage.removeItem('user')
+  return axios.get(AUTH_API_URL + 'logout')
 }
 
 const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem('user'))
 }
 
+const authHeader = () => {
+  const user = getCurrentUser()
+  if (user && user.access_token) {
+    return { Authorization: 'Bearer ' + user.access_token }
+  }
+
+  return {}
+}
+
+const isAuthenticated = () => {
+  const user = getCurrentUser()
+  return user && user.access_token
+}
+
 export default {
   register,
   signin,
   logout,
-  getCurrentUser
+  getCurrentUser,
+  authHeader,
+  isAuthenticated
 }
