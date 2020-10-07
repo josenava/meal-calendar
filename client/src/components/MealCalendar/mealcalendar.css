@@ -1,3 +1,9 @@
 thead {
     text-align: center;
 }
+
+td > span {
+    vertical-align: top;
+    text-align: left;
+    font-size: 10px;
+}
