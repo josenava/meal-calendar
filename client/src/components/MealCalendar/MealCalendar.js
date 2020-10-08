@@ -20,9 +20,19 @@ const MealCalendar = ({ history }) => {
   if (!AuthService.isAuthenticated()) {
     history.push('/')
   }
-  const today = new Date()
+  const handleDateChange = (currentDate, position) => {
+    const date = new Date(currentDate)
+    if (position === 'previous') {
+      setDateRange(getWeekDateRange(date.setDate(date.getDate() - 7)))
+      setToday(new Date(currentDate.setDate(currentDate.getDate() - 7)))
+    } else {
+      setDateRange(getWeekDateRange(date.setDate(date.getDate() + 7)))
+      setToday(new Date(currentDate.setDate(currentDate.getDate() + 7)))
+    }
+  }
+
+  const [today, setToday] = useState(new Date())
   const [meals, setMeals] = useState([])
-  // TODO use selector to change date
   const [dateRange, setDateRange] = useState(getWeekDateRange(today))
 
   const getMeals = async (dateRange) => {
@@ -30,12 +40,16 @@ const MealCalendar = ({ history }) => {
     setMeals(data)
   }
 
-  useEffect(() => { getMeals(dateRange) }, [])
+  useEffect(() => { getMeals(dateRange) }, [dateRange])
 
   return (
     <section id="meal-calendar">
       <h2>Here is your meal calendar for the week</h2>
-      <p>Today is: { today.toDateString() }</p>
+      <p>Week of: { dateRange[0].toDateString() } - { dateRange[1].toDateString()}</p>
+      <div>
+        <button type="button" className="btn btn-secondary" onClick={() => handleDateChange(today, 'previous')}>Previous</button>
+        <button type="button" className="btn btn-secondary" onClick={() => handleDateChange(today, 'next')}>Next</button>
+      </div>
       <div className="table-responsive">
         <table className="table table-bordered">
           <thead>
@@ -53,7 +67,9 @@ const MealCalendar = ({ history }) => {
 }
 
 MealCalendar.propTypes = {
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
+  today: PropTypes.instanceOf(Date),
+  dateRange: PropTypes.arrayOf(Date)
 }
 
 export default MealCalendar

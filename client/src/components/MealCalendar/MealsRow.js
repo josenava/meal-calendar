@@ -10,7 +10,9 @@ const MealsRow = ({ meals, type, startDate }) => {
       })
       if (meal === undefined) {
         const mealDate = new Date(startDate)
-        meal = Object.create({ type: type, date: mealDate.setDate(mealDate.getDate() + i) })
+        meal = Object.create({ type: type, date: new Date(mealDate.setDate(mealDate.getDate() + i)).toISOString().split('T')[0] })
+      } else {
+        console.log(meal)
       }
       return meal
     })
