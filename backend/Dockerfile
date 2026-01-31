@@ -17,9 +17,6 @@ RUN uv sync --frozen --no-dev --no-install-project --compile-bytecode
 # Copy application code
 COPY app/ ./app/
 
-# Compile application bytecode
-RUN .venv/bin/python -m compileall -q app/
-
 # Create data directory for SQLite
 RUN mkdir -p data
 

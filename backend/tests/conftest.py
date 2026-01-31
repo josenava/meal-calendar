@@ -2,19 +2,20 @@
 Test configuration and fixtures for the meal calendar backend.
 """
 import os
+
 # Set test database before importing app modules
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
-import pytest
 from datetime import date
+
+import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from fastapi.testclient import TestClient
 
 from app.database import Base, get_db
 from app.models import Meal
-
 
 # Create a test database in memory
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"

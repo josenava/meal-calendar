@@ -33,7 +33,7 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = []
+ignore = ["B008"]  # Allow Depends/Query in FastAPI function defaults
 
 [tool.ruff.format]
 quote-style = "double"

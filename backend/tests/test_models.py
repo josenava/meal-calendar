@@ -1,8 +1,9 @@
 """
 Tests for SQLAlchemy models.
 """
-import pytest
 from datetime import date
+
+import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Meal

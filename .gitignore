@@ -12,6 +12,12 @@ backend/app/__pycache__/
 backend/app/routers/__pycache__/
 *.pyc
 
+# Testing
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
 # Environment
 .env
 .env.local

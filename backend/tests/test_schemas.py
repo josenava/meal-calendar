@@ -1,11 +1,12 @@
 """
 Tests for Pydantic schemas validation.
 """
-import pytest
 from datetime import date
+
+import pytest
 from pydantic import ValidationError
 
-from app.schemas import MealCreate, MealUpdate, MealCopy, MealResponse
+from app.schemas import MealCopy, MealCreate, MealResponse, MealUpdate
 
 
 class TestMealCreate:

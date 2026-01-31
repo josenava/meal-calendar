@@ -1,8 +1,6 @@
 """
 Tests for the meals API endpoints.
 """
-import pytest
-from datetime import date
 
 
 class TestHealthEndpoint:

@@ -1,18 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from datetime import date
-from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Meal
-from ..schemas import MealCreate, MealUpdate, MealCopy, MealResponse
-
+from ..schemas import MealCopy, MealCreate, MealResponse, MealUpdate
 
 router = APIRouter(prefix="/api/meals", tags=["meals"])
 
 
-@router.get("", response_model=List[MealResponse])
+@router.get("", response_model=list[MealResponse])
 def get_meals(
     start_date: date = Query(..., description="Start date (inclusive)"),
     end_date: date = Query(..., description="End date (inclusive)"),
@@ -43,7 +42,7 @@ def create_meal(meal: MealCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=409,
             detail=f"A meal already exists for {meal.date} - {meal.meal_type}"
-        )
+        ) from None
     return db_meal
 
 
@@ -93,7 +92,8 @@ def copy_meal(meal_id: int, copy_data: MealCopy, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(
             status_code=409,
-            detail=f"A meal already exists for {copy_data.target_date} - {copy_data.target_meal_type}"
-        )
-    
+            detail=f"A meal already exists for {copy_data.target_date} - "
+            f"{copy_data.target_meal_type}",
+        ) from None
+
     return new_meal
