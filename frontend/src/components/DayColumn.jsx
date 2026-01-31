@@ -1,6 +1,6 @@
 import MealSlot from './MealSlot'
 
-const WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+const WEEKDAYS = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM']
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner']
 
 function isToday(date) {

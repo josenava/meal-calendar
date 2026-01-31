@@ -7,7 +7,7 @@ from typing import Any, cast
 import pytest
 from pydantic import ValidationError
 
-from app.schemas import MealCopy, MealCreate, MealResponse, MealType, MealUpdate
+from app.schemas import MAX_INGREDIENTS, MealCopy, MealCreate, MealResponse, MealUpdate
 
 
 class TestMealCreate:
@@ -23,6 +23,49 @@ class TestMealCreate:
         assert meal.name == "Pancakes"
         assert meal.date == date(2024, 1, 15)
         assert meal.meal_type == "breakfast"
+        assert meal.ingredients == []
+
+    def test_valid_meal_create_with_ingredients(self):
+        """Test creating a meal with ingredients."""
+        meal = MealCreate(
+            name="Pancakes",
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            ingredients=["flour", "eggs", "milk"]
+        )
+        assert meal.name == "Pancakes"
+        assert meal.ingredients == ["flour", "eggs", "milk"]
+
+    def test_meal_create_strips_ingredient_whitespace(self):
+        """Test that ingredient whitespace is stripped."""
+        meal = MealCreate(
+            name="Pancakes",
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            ingredients=["  flour  ", "eggs", "  milk"]
+        )
+        assert meal.ingredients == ["flour", "eggs", "milk"]
+
+    def test_meal_create_filters_empty_ingredients(self):
+        """Test that empty ingredients are filtered out."""
+        meal = MealCreate(
+            name="Pancakes",
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            ingredients=["flour", "", "  ", "eggs"]
+        )
+        assert meal.ingredients == ["flour", "eggs"]
+
+    def test_meal_create_max_ingredients_limit(self):
+        """Test that exceeding max ingredients raises validation error."""
+        with pytest.raises(ValidationError) as exc_info:
+            MealCreate(
+                name="Pancakes",
+                date=date(2024, 1, 15),
+                meal_type="breakfast",
+                ingredients=[f"ingredient{i}" for i in range(MAX_INGREDIENTS + 1)]
+            )
+        assert f"Maximum {MAX_INGREDIENTS} ingredients allowed" in str(exc_info.value)
 
     def test_meal_create_strips_whitespace(self):
         """Test that name whitespace is stripped."""
@@ -90,6 +133,32 @@ class TestMealUpdate:
         """Test creating a valid update schema."""
         update = MealUpdate(name="Updated Pancakes")
         assert update.name == "Updated Pancakes"
+        assert update.ingredients == []
+
+    def test_valid_meal_update_with_ingredients(self):
+        """Test updating meal with ingredients."""
+        update = MealUpdate(name="Pancakes", ingredients=["flour", "eggs"])
+        assert update.name == "Pancakes"
+        assert update.ingredients == ["flour", "eggs"]
+
+    def test_meal_update_strips_ingredient_whitespace(self):
+        """Test that ingredient whitespace is stripped in update."""
+        update = MealUpdate(name="Pancakes", ingredients=["  flour  ", "eggs"])
+        assert update.ingredients == ["flour", "eggs"]
+
+    def test_meal_update_filters_empty_ingredients(self):
+        """Test that empty ingredients are filtered in update."""
+        update = MealUpdate(name="Pancakes", ingredients=["flour", "", "eggs"])
+        assert update.ingredients == ["flour", "eggs"]
+
+    def test_meal_update_max_ingredients_limit(self):
+        """Test that exceeding max ingredients raises validation error in update."""
+        with pytest.raises(ValidationError) as exc_info:
+            MealUpdate(
+                name="Pancakes",
+                ingredients=[f"ingredient{i}" for i in range(MAX_INGREDIENTS + 1)]
+            )
+        assert f"Maximum {MAX_INGREDIENTS} ingredients allowed" in str(exc_info.value)
 
     def test_meal_update_strips_whitespace(self):
         """Test that name whitespace is stripped."""
@@ -163,6 +232,18 @@ class TestMealResponse:
         assert response.name == "Pancakes"
         assert response.date == date(2024, 1, 15)
         assert response.meal_type == "breakfast"
+        assert response.ingredients == []
+
+    def test_valid_meal_response_with_ingredients(self):
+        """Test creating a response schema with ingredients."""
+        response = MealResponse(
+            id=1,
+            name="Pancakes",
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            ingredients=["flour", "eggs", "milk"]
+        )
+        assert response.ingredients == ["flour", "eggs", "milk"]
 
     def test_meal_response_serialization(self):
         """Test that response serializes correctly."""
@@ -170,10 +251,12 @@ class TestMealResponse:
             id=1,
             name="Pancakes",
             date=date(2024, 1, 15),
-            meal_type="breakfast"
+            meal_type="breakfast",
+            ingredients=["flour", "eggs"]
         )
         data = response.model_dump()
         assert data["id"] == 1
         assert data["name"] == "Pancakes"
         assert data["date"] == date(2024, 1, 15)
         assert data["meal_type"] == "breakfast"
+        assert data["ingredients"] == ["flour", "eggs"]

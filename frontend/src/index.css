@@ -498,9 +498,9 @@ body {
 
 .date-picker-dropdown {
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 0;
-  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -791,6 +791,84 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* ================================
+   CHIPS / INGREDIENTS
+   ================================ */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.chip--small {
+  padding: 0.0625rem var(--spacing-xs);
+  font-size: 0.625rem;
+}
+
+.chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.chip__remove:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.ingredients-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.ingredients-input__field {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.ingredients-input__field input {
+  flex: 1;
+}
+
+.ingredients-input__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.ingredients-input__limit {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: right;
 }
 
 /* ================================

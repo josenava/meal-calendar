@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 
-const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+// Spanish weekdays starting Monday
+const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']
 const MONTHS = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ]
 
 function getDaysInMonth(year, month) {
@@ -11,7 +12,9 @@ function getDaysInMonth(year, month) {
 }
 
 function getFirstDayOfMonth(year, month) {
-    return new Date(year, month, 1).getDay()
+    // Convert Sunday=0 to Monday=0 format (Monday-based week)
+    const day = new Date(year, month, 1).getDay()
+    return day === 0 ? 6 : day - 1
 }
 
 function formatDateFromParts(year, month, day) {

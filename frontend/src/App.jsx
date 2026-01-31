@@ -57,7 +57,7 @@ export default function App() {
             setError(null)
         } catch (err) {
             setError(err.message)
-            showToast('Error loading meals', 'error')
+            showToast('Error al cargar las comidas', 'error')
         } finally {
             setLoading(false)
         }
@@ -100,22 +100,23 @@ export default function App() {
     }
 
     // Save meal (create or update)
-    const handleSaveMeal = async (name) => {
+    const handleSaveMeal = async (name, ingredients = []) => {
         if (!modalData) return
 
         try {
             if (modalData.meal) {
                 // Update existing
-                await updateMeal(modalData.meal.id, { name })
-                showToast('Meal updated!')
+                await updateMeal(modalData.meal.id, { name, ingredients })
+                showToast('¡Comida actualizada!')
             } else {
                 // Create new
                 await createMeal({
                     date: modalData.date,
                     meal_type: modalData.mealType,
-                    name
+                    name,
+                    ingredients
                 })
-                showToast('Meal added!')
+                showToast('¡Comida añadida!')
             }
             closeModal()
             fetchMeals()
@@ -130,7 +131,7 @@ export default function App() {
 
         try {
             await deleteMeal(modalData.meal.id)
-            showToast('Meal deleted!')
+            showToast('¡Comida eliminada!')
             closeModal()
             fetchMeals()
         } catch (err) {
@@ -144,7 +145,7 @@ export default function App() {
 
         try {
             await copyMeal(modalData.meal.id, targetDate, targetMealType)
-            showToast('Meal copied!')
+            showToast('¡Comida copiada!')
             fetchMeals()
         } catch (err) {
             showToast(err.message, 'error')

@@ -1,11 +1,12 @@
 const MEAL_LABELS = {
-    breakfast: 'Breakfast',
-    lunch: 'Lunch',
-    dinner: 'Dinner'
+    breakfast: 'Desayuno',
+    lunch: 'Almuerzo',
+    dinner: 'Cena'
 }
 
 export default function MealSlot({ mealType, meal, onClick }) {
     const isEmpty = !meal
+    const ingredients = meal?.ingredients || []
 
     return (
         <div
@@ -18,12 +19,21 @@ export default function MealSlot({ mealType, meal, onClick }) {
             {isEmpty ? (
                 <>
                     <span className="meal-slot__add-icon">+</span>
-                    <span className="meal-slot__add-text">Add {MEAL_LABELS[mealType]}</span>
+                    <span className="meal-slot__add-text">Añadir {MEAL_LABELS[mealType]}</span>
                 </>
             ) : (
                 <>
                     <div className="meal-slot__type">{MEAL_LABELS[mealType]}</div>
                     <div className="meal-slot__name">{meal.name}</div>
+                    {ingredients.length > 0 && (
+                        <div className="chips">
+                            {ingredients.map((ingredient, index) => (
+                                <span key={index} className="chip chip--small">
+                                    {ingredient}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
         </div>

@@ -23,7 +23,7 @@ describe('MealSlot', () => {
             )
             
             expect(screen.getByText('+')).toBeInTheDocument()
-            expect(screen.getByText('Add Breakfast')).toBeInTheDocument()
+            expect(screen.getByText('Añadir Desayuno')).toBeInTheDocument()
         })
 
         it('should have empty class when no meal', () => {
@@ -42,13 +42,13 @@ describe('MealSlot', () => {
             const { rerender } = render(
                 <MealSlot mealType="breakfast" meal={null} onClick={mockOnClick} />
             )
-            expect(screen.getByText('Add Breakfast')).toBeInTheDocument()
+            expect(screen.getByText('Añadir Desayuno')).toBeInTheDocument()
 
             rerender(<MealSlot mealType="lunch" meal={null} onClick={mockOnClick} />)
-            expect(screen.getByText('Add Lunch')).toBeInTheDocument()
+            expect(screen.getByText('Añadir Almuerzo')).toBeInTheDocument()
 
             rerender(<MealSlot mealType="dinner" meal={null} onClick={mockOnClick} />)
-            expect(screen.getByText('Add Dinner')).toBeInTheDocument()
+            expect(screen.getByText('Añadir Cena')).toBeInTheDocument()
         })
     })
 
@@ -70,7 +70,7 @@ describe('MealSlot', () => {
             )
             
             expect(screen.getByText('Pancakes')).toBeInTheDocument()
-            expect(screen.getByText('Breakfast')).toBeInTheDocument()
+            expect(screen.getByText('Desayuno')).toBeInTheDocument()
         })
 
         it('should not have empty class when meal exists', () => {
@@ -83,6 +83,52 @@ describe('MealSlot', () => {
             )
             
             expect(container.firstChild).not.toHaveClass('meal-slot--empty')
+        })
+
+        it('should render ingredients as chips', () => {
+            const mealWithIngredients = {
+                ...mockMeal,
+                ingredients: ['flour', 'eggs', 'milk']
+            }
+            render(
+                <MealSlot 
+                    mealType="breakfast" 
+                    meal={mealWithIngredients} 
+                    onClick={mockOnClick} 
+                />
+            )
+            
+            expect(screen.getByText('flour')).toBeInTheDocument()
+            expect(screen.getByText('eggs')).toBeInTheDocument()
+            expect(screen.getByText('milk')).toBeInTheDocument()
+        })
+
+        it('should not render chips container when no ingredients', () => {
+            const { container } = render(
+                <MealSlot 
+                    mealType="breakfast" 
+                    meal={mockMeal} 
+                    onClick={mockOnClick} 
+                />
+            )
+            
+            expect(container.querySelector('.chips')).not.toBeInTheDocument()
+        })
+
+        it('should handle empty ingredients array', () => {
+            const mealWithEmptyIngredients = {
+                ...mockMeal,
+                ingredients: []
+            }
+            const { container } = render(
+                <MealSlot 
+                    mealType="breakfast" 
+                    meal={mealWithEmptyIngredients} 
+                    onClick={mockOnClick} 
+                />
+            )
+            
+            expect(container.querySelector('.chips')).not.toBeInTheDocument()
         })
     })
 

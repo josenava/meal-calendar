@@ -32,19 +32,19 @@ describe('DayColumn', () => {
             />
         )
         
-        expect(screen.getByText('MON')).toBeInTheDocument()
+        expect(screen.getByText('LUN')).toBeInTheDocument()
         expect(screen.getByText('15')).toBeInTheDocument()
     })
 
     it('should display correct weekday labels', () => {
         const weekDates = [
-            { date: new Date('2024-01-15'), label: 'MON' },
-            { date: new Date('2024-01-16'), label: 'TUE' },
-            { date: new Date('2024-01-17'), label: 'WED' },
-            { date: new Date('2024-01-18'), label: 'THU' },
-            { date: new Date('2024-01-19'), label: 'FRI' },
-            { date: new Date('2024-01-20'), label: 'SAT' },
-            { date: new Date('2024-01-21'), label: 'SUN' },
+            { date: new Date('2024-01-15'), label: 'LUN' },
+            { date: new Date('2024-01-16'), label: 'MAR' },
+            { date: new Date('2024-01-17'), label: 'MIÉ' },
+            { date: new Date('2024-01-18'), label: 'JUE' },
+            { date: new Date('2024-01-19'), label: 'VIE' },
+            { date: new Date('2024-01-20'), label: 'SÁB' },
+            { date: new Date('2024-01-21'), label: 'DOM' },
         ]
 
         weekDates.forEach(({ date, label }) => {

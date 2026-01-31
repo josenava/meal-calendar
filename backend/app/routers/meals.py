@@ -31,7 +31,8 @@ def create_meal(meal: MealCreate, db: Session = Depends(get_db)):
     db_meal = Meal(
         date=meal.date,
         meal_type=meal.meal_type,
-        name=meal.name
+        name=meal.name,
+        ingredients=meal.ingredients
     )
     try:
         db.add(db_meal)
@@ -54,6 +55,7 @@ def update_meal(meal_id: int, meal: MealUpdate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Meal not found")
     
     db_meal.name = meal.name
+    db_meal.ingredients = meal.ingredients
     db.commit()
     db.refresh(db_meal)
     return db_meal
@@ -81,7 +83,8 @@ def copy_meal(meal_id: int, copy_data: MealCopy, db: Session = Depends(get_db)):
     new_meal = Meal(
         date=copy_data.target_date,
         meal_type=copy_data.target_meal_type,
-        name=source_meal.name
+        name=source_meal.name,
+        ingredients=source_meal.ingredients or []
     )
     
     try:

@@ -134,6 +134,49 @@ class TestCreateMeal:
         assert response.status_code == 201
         assert response.json()["name"] == "Pancakes"
 
+    def test_create_meal_with_ingredients(self, client):
+        """Test creating a meal with ingredients."""
+        response = client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs", "milk"]
+        })
+        assert response.status_code == 201
+        data = response.json()
+        assert data["ingredients"] == ["flour", "eggs", "milk"]
+
+    def test_create_meal_without_ingredients(self, client):
+        """Test creating a meal without ingredients returns empty list."""
+        response = client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes"
+        })
+        assert response.status_code == 201
+        assert response.json()["ingredients"] == []
+
+    def test_create_meal_ingredients_strips_whitespace(self, client):
+        """Test that ingredient whitespace is stripped."""
+        response = client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["  flour  ", "eggs"]
+        })
+        assert response.status_code == 201
+        assert response.json()["ingredients"] == ["flour", "eggs"]
+
+    def test_create_meal_too_many_ingredients_fails(self, client):
+        """Test that exceeding max ingredients fails."""
+        response = client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": [f"ingredient{i}" for i in range(11)]
+        })
+        assert response.status_code == 422
+
 
 class TestUpdateMeal:
     """Tests for PUT /api/meals/{meal_id} endpoint."""
@@ -174,6 +217,36 @@ class TestUpdateMeal:
         )
         assert response.status_code == 200
         assert response.json()["name"] == "Waffles"
+
+    def test_update_meal_with_ingredients(self, client, sample_meal):
+        """Test updating a meal with ingredients."""
+        response = client.put(
+            f"/api/meals/{sample_meal.id}",
+            json={"name": "Waffles", "ingredients": ["flour", "eggs"]}
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["name"] == "Waffles"
+        assert data["ingredients"] == ["flour", "eggs"]
+
+    def test_update_meal_replaces_ingredients(self, client):
+        """Test that updating ingredients replaces the list."""
+        # First create a meal with ingredients
+        create_response = client.post("/api/meals", json={
+            "date": "2024-01-18",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs"]
+        })
+        meal_id = create_response.json()["id"]
+        
+        # Update with new ingredients
+        update_response = client.put(
+            f"/api/meals/{meal_id}",
+            json={"name": "Pancakes", "ingredients": ["maple syrup"]}
+        )
+        assert update_response.status_code == 200
+        assert update_response.json()["ingredients"] == ["maple syrup"]
 
 
 class TestDeleteMeal:
@@ -261,3 +334,26 @@ class TestCopyMeal:
             json={"target_date": "2024-01-20", "target_meal_type": "snack"}
         )
         assert response.status_code == 422
+
+    def test_copy_meal_copies_ingredients(self, client):
+        """Test that copying a meal also copies ingredients."""
+        # Create a meal with ingredients
+        create_response = client.post("/api/meals", json={
+            "date": "2024-01-19",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs", "milk"]
+        })
+        meal_id = create_response.json()["id"]
+        
+        # Copy the meal
+        copy_response = client.post(
+            f"/api/meals/{meal_id}/copy",
+            json={"target_date": "2024-01-20", "target_meal_type": "dinner"}
+        )
+        assert copy_response.status_code == 201
+        data = copy_response.json()
+        assert data["name"] == "Pancakes"
+        assert data["ingredients"] == ["flour", "eggs", "milk"]
+        assert data["date"] == "2024-01-20"
+        assert data["meal_type"] == "dinner"
