@@ -28,6 +28,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
     const [searchTerm, setSearchTerm] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [isSearching, setIsSearching] = useState(false)
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false)
 
     const isEditing = !!meal
     const canSave = name.trim().length > 0
@@ -200,42 +201,53 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                         </div>
                     </div>
 
-                    {/* Search Section */}
-                    <div className="search-section">
-                        <div className="search-section__title">
-                            <span>🔍</span> {t('searchByIngredient')}
-                        </div>
-                        <input
-                            type="text"
-                            className="form-input"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder={t('searchPlaceholder')}
-                        />
-                        {isSearching && (
-                            <div className="search-results">
-                                <div className="search-results__empty">{t('searching')}</div>
-                            </div>
-                        )}
-                        {!isSearching && searchTerm.trim() && searchResults.length === 0 && (
-                            <div className="search-results">
-                                <div className="search-results__empty">{t('noResults')}</div>
-                            </div>
-                        )}
-                        {!isSearching && searchResults.length > 0 && (
-                            <div className="search-results">
-                                {searchResults.map((result) => (
-                                    <div
-                                        key={result.id}
-                                        className="search-result-item"
-                                        onClick={() => handleSelectSearchResult(result)}
-                                    >
-                                        <span className="search-result-item__name">{result.name}</span>
-                                        <span className="search-result-item__meta">
-                                            {MEAL_EMOJIS[result.meal_type]} {formatDisplayDate(result.date)}
-                                        </span>
+                    {/* Search Section (Collapsible) */}
+                    <div className={`search-section ${isSearchExpanded ? 'search-section--expanded' : ''}`}>
+                        <button
+                            type="button"
+                            className="search-section__header"
+                            onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        >
+                            <span className="search-section__title">
+                                <span>🔍</span> {t('searchByIngredient')}
+                            </span>
+                            <span className="search-section__toggle">{isSearchExpanded ? '▲' : '▼'}</span>
+                        </button>
+                        {isSearchExpanded && (
+                            <div className="search-section__content">
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder={t('searchPlaceholder')}
+                                />
+                                {isSearching && (
+                                    <div className="search-results">
+                                        <div className="search-results__empty">{t('searching')}</div>
                                     </div>
-                                ))}
+                                )}
+                                {!isSearching && searchTerm.trim() && searchResults.length === 0 && (
+                                    <div className="search-results">
+                                        <div className="search-results__empty">{t('noResults')}</div>
+                                    </div>
+                                )}
+                                {!isSearching && searchResults.length > 0 && (
+                                    <div className="search-results">
+                                        {searchResults.map((result) => (
+                                            <div
+                                                key={result.id}
+                                                className="search-result-item"
+                                                onClick={() => handleSelectSearchResult(result)}
+                                            >
+                                                <span className="search-result-item__name">{result.name}</span>
+                                                <span className="search-result-item__meta">
+                                                    {MEAL_EMOJIS[result.meal_type]} {formatDisplayDate(result.date)}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

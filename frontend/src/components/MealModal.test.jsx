@@ -212,16 +212,31 @@ describe('MealModal', () => {
     })
 
     describe('ingredient search', () => {
-        it('should render search section', () => {
+        it('should render search section collapsed by default', () => {
             renderWithI18n(<MealModal {...defaultProps} />)
             
             expect(screen.getByText(/Search by ingredient/)).toBeInTheDocument()
+            // Input should not be visible when collapsed
+            expect(screen.queryByPlaceholderText('Enter ingredient name...')).not.toBeInTheDocument()
+        })
+
+        it('should expand search section when header is clicked', async () => {
+            const user = userEvent.setup()
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            // Click on the search header to expand
+            await user.click(screen.getByText(/Search by ingredient/))
+            
+            // Input should now be visible
             expect(screen.getByPlaceholderText('Enter ingredient name...')).toBeInTheDocument()
         })
 
         it('should show search results after typing', async () => {
             const user = userEvent.setup()
             renderWithI18n(<MealModal {...defaultProps} />)
+            
+            // Expand search section first
+            await user.click(screen.getByText(/Search by ingredient/))
             
             const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
             await user.type(searchInput, 'eggs')
@@ -239,6 +254,9 @@ describe('MealModal', () => {
             const user = userEvent.setup()
             renderWithI18n(<MealModal {...defaultProps} />)
             
+            // Expand search section first
+            await user.click(screen.getByText(/Search by ingredient/))
+            
             const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
             await user.type(searchInput, 'chocolate')
             
@@ -250,6 +268,9 @@ describe('MealModal', () => {
         it('should auto-fill form when clicking a search result', async () => {
             const user = userEvent.setup()
             renderWithI18n(<MealModal {...defaultProps} />)
+            
+            // Expand search section first
+            await user.click(screen.getByText(/Search by ingredient/))
             
             const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
             await user.type(searchInput, 'eggs')
@@ -271,6 +292,9 @@ describe('MealModal', () => {
         it('should clear results when search is cleared', async () => {
             const user = userEvent.setup()
             renderWithI18n(<MealModal {...defaultProps} />)
+            
+            // Expand search section first
+            await user.click(screen.getByText(/Search by ingredient/))
             
             const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
             await user.type(searchInput, 'eggs')
