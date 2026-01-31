@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ./backend
+    container_name: meal-calendar-backend
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///./data/meals.db
+    networks:
+      - meal-network
+
+  frontend:
+    build: ./frontend
+    container_name: meal-calendar-frontend
+    restart: unless-stopped
+    ports:
+      - "5175:80"
+    depends_on:
+      - backend
+    networks:
+      - meal-network
+
+networks:
+  meal-network:
+    driver: bridge

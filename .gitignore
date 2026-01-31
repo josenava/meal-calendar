@@ -1,0 +1,26 @@
+# Database
+data/*.db
+data/*.db-journal
+
+# Dependencies
+node_modules/
+
+# Build outputs
+frontend/dist/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/routers/__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
