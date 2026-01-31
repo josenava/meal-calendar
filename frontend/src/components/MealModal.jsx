@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DatePicker from './DatePicker'
 import { useTranslation } from '../i18n/LanguageContext'
+import { searchMealsByIngredient } from '../api/meals'
 
 const MEAL_EMOJIS = {
     breakfast: '🌅',
@@ -24,12 +25,45 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
     const [showTypeSelect, setShowTypeSelect] = useState(false)
     const [saving, setSaving] = useState(false)
     const [copying, setCopying] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
+    const [searchResults, setSearchResults] = useState([])
+    const [isSearching, setIsSearching] = useState(false)
 
     const isEditing = !!meal
     const canSave = name.trim().length > 0
     const canCopy = isEditing && copyDate
     const canAddIngredient = ingredients.length < MAX_INGREDIENTS && ingredientInput.trim().length > 0
-    
+
+    // Debounced search effect
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setSearchResults([])
+            return
+        }
+
+        const timer = setTimeout(async () => {
+            setIsSearching(true)
+            try {
+                const results = await searchMealsByIngredient(searchTerm.trim())
+                setSearchResults(results)
+            } catch (error) {
+                console.error('Search failed:', error)
+                setSearchResults([])
+            } finally {
+                setIsSearching(false)
+            }
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [searchTerm])
+
+    const handleSelectSearchResult = (result) => {
+        setName(result.name)
+        setIngredients(result.ingredients || [])
+        setSearchTerm('')
+        setSearchResults([])
+    }
+
     function formatDisplayDate(dateStr) {
         const [year, month, day] = dateStr.split('-').map(Number)
         const dateObj = new Date(year, month - 1, day)
@@ -164,6 +198,46 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                 {ingredients.length}/{MAX_INGREDIENTS}
                             </div>
                         </div>
+                    </div>
+
+                    {/* Search Section */}
+                    <div className="search-section">
+                        <div className="search-section__title">
+                            <span>🔍</span> {t('searchByIngredient')}
+                        </div>
+                        <input
+                            type="text"
+                            className="form-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder={t('searchPlaceholder')}
+                        />
+                        {isSearching && (
+                            <div className="search-results">
+                                <div className="search-results__empty">{t('searching')}</div>
+                            </div>
+                        )}
+                        {!isSearching && searchTerm.trim() && searchResults.length === 0 && (
+                            <div className="search-results">
+                                <div className="search-results__empty">{t('noResults')}</div>
+                            </div>
+                        )}
+                        {!isSearching && searchResults.length > 0 && (
+                            <div className="search-results">
+                                {searchResults.map((result) => (
+                                    <div
+                                        key={result.id}
+                                        className="search-result-item"
+                                        onClick={() => handleSelectSearchResult(result)}
+                                    >
+                                        <span className="search-result-item__name">{result.name}</span>
+                                        <span className="search-result-item__meta">
+                                            {MEAL_EMOJIS[result.meal_type]} {formatDisplayDate(result.date)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Copy Section (only for existing meals) */}

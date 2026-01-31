@@ -1,6 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,33 @@ from ..models import Meal
 from ..schemas import MealCopy, MealCreate, MealResponse, MealUpdate
 
 router = APIRouter(prefix="/api/meals", tags=["meals"])
+
+
+@router.get("/search", response_model=list[MealResponse])
+def search_meals_by_ingredient(
+    ingredient: str = Query(..., min_length=1, description="Ingredient to search for"),
+    db: Session = Depends(get_db)
+):
+    """Search for meals containing a specific ingredient (exact match, case-insensitive)."""
+    # Get meal IDs that contain the ingredient using json_each
+    stmt = text("""
+        SELECT DISTINCT m.id
+        FROM meals m, json_each(m.ingredients) AS j
+        WHERE LOWER(j.value) = LOWER(:ingredient)
+        ORDER BY m.date DESC
+        LIMIT 10
+    """)
+    result = db.execute(stmt, {"ingredient": ingredient.strip()})
+    meal_ids = [row[0] for row in result.fetchall()]
+    
+    if not meal_ids:
+        return []
+    
+    # Fetch full Meal objects using ORM for proper serialization
+    meals = db.query(Meal).filter(Meal.id.in_(meal_ids)).all()
+    # Re-sort by date descending since IN doesn't preserve order
+    meals.sort(key=lambda m: m.date, reverse=True)
+    return meals
 
 
 @router.get("", response_model=list[MealResponse])

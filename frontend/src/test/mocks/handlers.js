@@ -6,11 +6,11 @@ import { http, HttpResponse } from 'msw'
 
 // Sample meal data for testing
 export const mockMeals = [
-    { id: 1, date: '2024-01-15', meal_type: 'breakfast', name: 'Pancakes' },
-    { id: 2, date: '2024-01-15', meal_type: 'lunch', name: 'Chicken Salad' },
-    { id: 3, date: '2024-01-15', meal_type: 'dinner', name: 'Pasta Carbonara' },
-    { id: 4, date: '2024-01-16', meal_type: 'breakfast', name: 'Oatmeal' },
-    { id: 5, date: '2024-01-16', meal_type: 'lunch', name: 'Sandwich' },
+    { id: 1, date: '2024-01-15', meal_type: 'breakfast', name: 'Pancakes', ingredients: ['flour', 'eggs', 'milk'] },
+    { id: 2, date: '2024-01-15', meal_type: 'lunch', name: 'Chicken Salad', ingredients: ['chicken', 'lettuce', 'tomato'] },
+    { id: 3, date: '2024-01-15', meal_type: 'dinner', name: 'Pasta Carbonara', ingredients: ['pasta', 'eggs', 'bacon'] },
+    { id: 4, date: '2024-01-16', meal_type: 'breakfast', name: 'Oatmeal', ingredients: ['oats', 'milk', 'honey'] },
+    { id: 5, date: '2024-01-16', meal_type: 'lunch', name: 'Sandwich', ingredients: ['bread', 'cheese', 'ham'] },
 ]
 
 let meals = [...mockMeals]
@@ -159,5 +159,28 @@ export const handlers = [
     // Health check
     http.get('/api/health', () => {
         return HttpResponse.json({ status: 'healthy' })
+    }),
+
+    // GET /api/meals/search
+    http.get('/api/meals/search', ({ request }) => {
+        const url = new URL(request.url)
+        const ingredient = url.searchParams.get('ingredient')
+
+        if (!ingredient || !ingredient.trim()) {
+            return HttpResponse.json(
+                { detail: 'Missing required parameter: ingredient' },
+                { status: 422 }
+            )
+        }
+
+        const searchTerm = ingredient.toLowerCase().trim()
+        const matchingMeals = meals
+            .filter(meal => 
+                meal.ingredients?.some(ing => ing.toLowerCase() === searchTerm)
+            )
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .slice(0, 10)
+
+        return HttpResponse.json(matchingMeals)
     }),
 ]

@@ -1,11 +1,21 @@
 /**
  * Tests for the MealModal component
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll, afterEach } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { renderWithI18n } from '../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import MealModal from './MealModal'
+import { server } from '../test/mocks/server'
+import { resetMeals } from '../test/mocks/handlers'
+
+// Setup MSW server for search API tests
+beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }))
+afterAll(() => server.close())
+afterEach(() => {
+    server.resetHandlers()
+    resetMeals()
+})
 
 describe('MealModal', () => {
     const defaultProps = {
@@ -198,6 +208,84 @@ describe('MealModal', () => {
             renderWithI18n(<MealModal {...defaultProps} meal={existingMeal} />)
             
             expect(screen.getByText(/Copy to another day/)).toBeInTheDocument()
+        })
+    })
+
+    describe('ingredient search', () => {
+        it('should render search section', () => {
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            expect(screen.getByText(/Search by ingredient/)).toBeInTheDocument()
+            expect(screen.getByPlaceholderText('Enter ingredient name...')).toBeInTheDocument()
+        })
+
+        it('should show search results after typing', async () => {
+            const user = userEvent.setup()
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
+            await user.type(searchInput, 'eggs')
+            
+            // Wait for debounced search and results
+            await waitFor(() => {
+                expect(screen.getByText('Pancakes')).toBeInTheDocument()
+            }, { timeout: 1000 })
+            
+            // Should also show Pasta Carbonara (has eggs)
+            expect(screen.getByText('Pasta Carbonara')).toBeInTheDocument()
+        })
+
+        it('should show no results message when no matches', async () => {
+            const user = userEvent.setup()
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
+            await user.type(searchInput, 'chocolate')
+            
+            await waitFor(() => {
+                expect(screen.getByText('No meals found')).toBeInTheDocument()
+            }, { timeout: 1000 })
+        })
+
+        it('should auto-fill form when clicking a search result', async () => {
+            const user = userEvent.setup()
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
+            await user.type(searchInput, 'eggs')
+            
+            await waitFor(() => {
+                expect(screen.getByText('Pancakes')).toBeInTheDocument()
+            }, { timeout: 1000 })
+            
+            // Click on Pancakes result
+            await user.click(screen.getByText('Pancakes'))
+            
+            // Check form is filled
+            expect(screen.getByDisplayValue('Pancakes')).toBeInTheDocument()
+            expect(screen.getByText('flour')).toBeInTheDocument()
+            expect(screen.getByText('eggs')).toBeInTheDocument()
+            expect(screen.getByText('milk')).toBeInTheDocument()
+        })
+
+        it('should clear results when search is cleared', async () => {
+            const user = userEvent.setup()
+            renderWithI18n(<MealModal {...defaultProps} />)
+            
+            const searchInput = screen.getByPlaceholderText('Enter ingredient name...')
+            await user.type(searchInput, 'eggs')
+            
+            await waitFor(() => {
+                expect(screen.getByText('Pancakes')).toBeInTheDocument()
+            }, { timeout: 1000 })
+            
+            // Clear the search
+            await user.clear(searchInput)
+            
+            // Results should be hidden
+            await waitFor(() => {
+                expect(screen.queryByText('Pasta Carbonara')).not.toBeInTheDocument()
+            })
         })
     })
 })

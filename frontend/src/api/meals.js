@@ -75,3 +75,16 @@ export async function copyMeal(id, targetDate, targetMealType) {
     }
     return response.json();
 }
+
+/**
+ * Search meals by ingredient
+ */
+export async function searchMealsByIngredient(ingredient) {
+    const response = await fetch(
+        `${API_BASE}/meals/search?ingredient=${encodeURIComponent(ingredient)}`
+    );
+    if (!response.ok) {
+        throw new Error('Failed to search meals');
+    }
+    return response.json();
+}

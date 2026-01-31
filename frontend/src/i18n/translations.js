@@ -66,6 +66,12 @@ export const translations = {
         // Language
         language: 'Language',
         
+        // Search
+        searchByIngredient: 'Search by ingredient',
+        searchPlaceholder: 'Enter ingredient name...',
+        noResults: 'No meals found',
+        searching: 'Searching...',
+        
         // Date locale
         dateLocale: 'en-US'
     },
@@ -135,6 +141,12 @@ export const translations = {
         
         // Language
         language: 'Idioma',
+        
+        // Search
+        searchByIngredient: 'Buscar por ingrediente',
+        searchPlaceholder: 'Introduce nombre del ingrediente...',
+        noResults: 'No se encontraron comidas',
+        searching: 'Buscando...',
         
         // Date locale
         dateLocale: 'es-ES'

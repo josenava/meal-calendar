@@ -357,3 +357,136 @@ class TestCopyMeal:
         assert data["ingredients"] == ["flour", "eggs", "milk"]
         assert data["date"] == "2024-01-20"
         assert data["meal_type"] == "dinner"
+
+
+class TestSearchMeals:
+    """Tests for GET /api/meals/search endpoint."""
+
+    def test_search_meals_by_ingredient(self, client):
+        """Test searching meals by ingredient returns matching meals."""
+        # Create meals with ingredients
+        client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs", "milk"]
+        })
+        client.post("/api/meals", json={
+            "date": "2024-01-16",
+            "meal_type": "lunch",
+            "name": "Omelette",
+            "ingredients": ["eggs", "cheese", "ham"]
+        })
+        client.post("/api/meals", json={
+            "date": "2024-01-17",
+            "meal_type": "dinner",
+            "name": "Pizza",
+            "ingredients": ["flour", "tomato", "cheese"]
+        })
+        
+        # Search for eggs
+        response = client.get("/api/meals/search?ingredient=eggs")
+        assert response.status_code == 200
+        meals = response.json()
+        assert len(meals) == 2
+        names = [m["name"] for m in meals]
+        assert "Pancakes" in names
+        assert "Omelette" in names
+
+    def test_search_meals_case_insensitive(self, client):
+        """Test that search is case insensitive."""
+        client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["Flour", "EGGS", "Milk"]
+        })
+        
+        # Search with lowercase
+        response = client.get("/api/meals/search?ingredient=flour")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        
+        # Search with uppercase
+        response = client.get("/api/meals/search?ingredient=EGGS")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+    def test_search_meals_returns_latest_first(self, client):
+        """Test that search results are ordered by date descending."""
+        client.post("/api/meals", json={
+            "date": "2024-01-10",
+            "meal_type": "breakfast",
+            "name": "Old Meal",
+            "ingredients": ["cheese"]
+        })
+        client.post("/api/meals", json={
+            "date": "2024-01-20",
+            "meal_type": "lunch",
+            "name": "New Meal",
+            "ingredients": ["cheese"]
+        })
+        
+        response = client.get("/api/meals/search?ingredient=cheese")
+        assert response.status_code == 200
+        meals = response.json()
+        assert len(meals) == 2
+        assert meals[0]["name"] == "New Meal"
+        assert meals[1]["name"] == "Old Meal"
+
+    def test_search_meals_limit_10(self, client):
+        """Test that search returns at most 10 results."""
+        for i in range(15):
+            client.post("/api/meals", json={
+                "date": f"2024-01-{i+1:02d}",
+                "meal_type": "breakfast",
+                "name": f"Meal {i}",
+                "ingredients": ["test"]
+            })
+        
+        response = client.get("/api/meals/search?ingredient=test")
+        assert response.status_code == 200
+        meals = response.json()
+        assert len(meals) == 10
+
+    def test_search_meals_no_results(self, client):
+        """Test searching for non-existent ingredient returns empty."""
+        client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Pancakes",
+            "ingredients": ["flour"]
+        })
+        
+        response = client.get("/api/meals/search?ingredient=chocolate")
+        assert response.status_code == 200
+        assert response.json() == []
+
+    def test_search_meals_empty_ingredient_fails(self, client):
+        """Test that empty ingredient parameter fails validation."""
+        response = client.get("/api/meals/search?ingredient=")
+        assert response.status_code == 422
+
+    def test_search_meals_missing_ingredient_fails(self, client):
+        """Test that missing ingredient parameter fails."""
+        response = client.get("/api/meals/search")
+        assert response.status_code == 422
+
+    def test_search_meals_exact_match_only(self, client):
+        """Test that search uses exact matching (not partial)."""
+        client.post("/api/meals", json={
+            "date": "2024-01-15",
+            "meal_type": "breakfast",
+            "name": "Cheesecake",
+            "ingredients": ["cheese", "cream"]
+        })
+        
+        # Should match "cheese"
+        response = client.get("/api/meals/search?ingredient=cheese")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        
+        # Should NOT match partial "chee"
+        response = client.get("/api/meals/search?ingredient=chee")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
