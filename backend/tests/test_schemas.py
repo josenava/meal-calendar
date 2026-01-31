@@ -2,11 +2,12 @@
 Tests for Pydantic schemas validation.
 """
 from datetime import date
+from typing import Any, cast
 
 import pytest
 from pydantic import ValidationError
 
-from app.schemas import MealCopy, MealCreate, MealResponse, MealUpdate
+from app.schemas import MealCopy, MealCreate, MealResponse, MealType, MealUpdate
 
 
 class TestMealCreate:
@@ -34,7 +35,7 @@ class TestMealCreate:
 
     def test_meal_create_all_meal_types(self):
         """Test all valid meal types."""
-        for meal_type in ["breakfast", "lunch", "dinner"]:
+        for meal_type in ("breakfast", "lunch", "dinner"):
             meal = MealCreate(
                 name="Test",
                 date=date(2024, 1, 15),
@@ -68,7 +69,7 @@ class TestMealCreate:
             MealCreate(
                 name="Test",
                 date=date(2024, 1, 15),
-                meal_type="brunch"
+                meal_type=cast(Any, "brunch")
             )
         assert "meal_type" in str(exc_info.value).lower()
 
@@ -76,7 +77,7 @@ class TestMealCreate:
         """Test creating meal with string date (auto-parsing)."""
         meal = MealCreate(
             name="Test",
-            date="2024-01-15",
+            date=cast(Any, "2024-01-15"),
             meal_type="breakfast"
         )
         assert meal.date == date(2024, 1, 15)
@@ -122,7 +123,7 @@ class TestMealCopy:
 
     def test_meal_copy_all_meal_types(self):
         """Test all valid meal types for copying."""
-        for meal_type in ["breakfast", "lunch", "dinner"]:
+        for meal_type in ("breakfast", "lunch", "dinner"):
             copy = MealCopy(
                 target_date=date(2024, 1, 20),
                 target_meal_type=meal_type
@@ -134,14 +135,14 @@ class TestMealCopy:
         with pytest.raises(ValidationError) as exc_info:
             MealCopy(
                 target_date=date(2024, 1, 20),
-                target_meal_type="snack"
+                target_meal_type=cast(Any, "snack")
             )
         assert "target_meal_type" in str(exc_info.value).lower()
 
     def test_meal_copy_from_string_date(self):
         """Test creating copy with string date (auto-parsing)."""
         copy = MealCopy(
-            target_date="2024-01-20",
+            target_date=cast(Any, "2024-01-20"),
             target_meal_type="dinner"
         )
         assert copy.target_date == date(2024, 1, 20)

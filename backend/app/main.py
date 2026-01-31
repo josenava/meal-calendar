@@ -20,7 +20,7 @@ app = FastAPI(
 
 # Configure CORS
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type: ignore[arg-type]
     allow_origins=["*"],  # Allow all origins for local development
     allow_credentials=True,
     allow_methods=["*"],
