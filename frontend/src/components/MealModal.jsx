@@ -1,11 +1,6 @@
 import { useState } from 'react'
 import DatePicker from './DatePicker'
-
-const MEAL_LABELS = {
-    breakfast: 'Desayuno',
-    lunch: 'Almuerzo',
-    dinner: 'Cena'
-}
+import { useTranslation } from '../i18n/LanguageContext'
 
 const MEAL_EMOJIS = {
     breakfast: '🌅',
@@ -16,19 +11,10 @@ const MEAL_EMOJIS = {
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner']
 const MAX_INGREDIENTS = 10
 
-function formatDisplayDate(dateStr) {
-    // Parse date string manually to avoid timezone issues
-    // dateStr is in format "YYYY-MM-DD"
-    const [year, month, day] = dateStr.split('-').map(Number)
-    const date = new Date(year, month - 1, day) // month is 0-indexed
-    return date.toLocaleDateString('es-ES', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric'
-    })
-}
-
 export default function MealModal({ date, mealType, meal, onClose, onSave, onDelete, onCopy }) {
+    const { t } = useTranslation()
+    const mealLabels = t('meals')
+    
     const [name, setName] = useState(meal?.name || '')
     const [ingredients, setIngredients] = useState(meal?.ingredients || [])
     const [ingredientInput, setIngredientInput] = useState('')
@@ -43,6 +29,16 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
     const canSave = name.trim().length > 0
     const canCopy = isEditing && copyDate
     const canAddIngredient = ingredients.length < MAX_INGREDIENTS && ingredientInput.trim().length > 0
+    
+    function formatDisplayDate(dateStr) {
+        const [year, month, day] = dateStr.split('-').map(Number)
+        const dateObj = new Date(year, month - 1, day)
+        return dateObj.toLocaleDateString(t('dateLocale'), {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+        })
+    }
 
     const handleAddIngredient = () => {
         const trimmed = ingredientInput.trim()
@@ -93,13 +89,13 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                     <div className="modal__icon">🍴</div>
                     <div className="modal__title-group">
                         <h2 className="modal__title">
-                            {isEditing ? 'Editar' : 'Añadir'} {MEAL_LABELS[mealType]}
+                            {isEditing ? t('editMeal', { mealType: mealLabels[mealType] }) : t('addMealTitle', { mealType: mealLabels[mealType] })}
                         </h2>
                         <p className="modal__subtitle">
                             {MEAL_EMOJIS[mealType]} {formatDisplayDate(date)}
                         </p>
                     </div>
-                    <button className="modal__close" onClick={onClose} aria-label="Cerrar">
+                    <button className="modal__close" onClick={onClose} aria-label={t('close')}>
                         ×
                     </button>
                 </div>
@@ -108,7 +104,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                 <div className="modal__body">
                     {/* Meal Name */}
                     <div className="form-group">
-                        <label className="form-label" htmlFor="meal-name">Nombre de la comida</label>
+                        <label className="form-label" htmlFor="meal-name">{t('mealName')}</label>
                         <input
                             id="meal-name"
                             type="text"
@@ -116,7 +112,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Introduce el nombre..."
+                            placeholder={t('mealNamePlaceholder')}
                             autoFocus
                         />
                     </div>
@@ -124,7 +120,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                     {/* Ingredients */}
                     <div className="form-group">
                         <label className="form-label" htmlFor="ingredient-input">
-                            Ingredientes
+                            {t('ingredients')}
                         </label>
                         <div className="ingredients-input">
                             <div className="ingredients-input__field">
@@ -135,7 +131,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                     value={ingredientInput}
                                     onChange={(e) => setIngredientInput(e.target.value)}
                                     onKeyDown={handleIngredientKeyDown}
-                                    placeholder="Añadir ingrediente..."
+                                    placeholder={t('addIngredientPlaceholder')}
                                     disabled={ingredients.length >= MAX_INGREDIENTS}
                                 />
                                 <button
@@ -144,7 +140,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                     onClick={handleAddIngredient}
                                     disabled={!canAddIngredient}
                                 >
-                                    Añadir
+                                    {t('add')}
                                 </button>
                             </div>
                             {ingredients.length > 0 && (
@@ -156,7 +152,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                                 type="button"
                                                 className="chip__remove"
                                                 onClick={() => handleRemoveIngredient(index)}
-                                                aria-label={`Eliminar ${ingredient}`}
+                                                aria-label={t('removeIngredient', { ingredient })}
                                             >
                                                 ×
                                             </button>
@@ -174,7 +170,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                     {isEditing && (
                         <div className="copy-section">
                             <div className="copy-section__title">
-                                <span>📋</span> Copiar a otro día
+                                <span>📋</span> {t('copyToAnotherDay')}
                             </div>
 
                             <div className="copy-section__fields">
@@ -186,7 +182,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                         onClick={() => setShowDatePicker(!showDatePicker)}
                                     >
                                         <span>📅</span>
-                                        <span>{copyDate ? formatDisplayDate(copyDate) : 'Elige una fecha'}</span>
+                                        <span>{copyDate ? formatDisplayDate(copyDate) : t('selectDate')}</span>
                                     </button>
                                     {showDatePicker && (
                                         <DatePicker
@@ -209,7 +205,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                             onClick={() => setShowTypeSelect(!showTypeSelect)}
                                         >
                                             <span className="select__value">
-                                                {MEAL_EMOJIS[copyMealType]} {MEAL_LABELS[copyMealType]}
+                                                {MEAL_EMOJIS[copyMealType]} {mealLabels[copyMealType]}
                                             </span>
                                             <span>▾</span>
                                         </button>
@@ -225,7 +221,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                                             setShowTypeSelect(false)
                                                         }}
                                                     >
-                                                        {MEAL_EMOJIS[type]} {MEAL_LABELS[type]}
+                                                        {MEAL_EMOJIS[type]} {mealLabels[type]}
                                                     </button>
                                                 ))}
                                             </div>
@@ -241,7 +237,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                     onClick={() => setCopyDate('')}
                                     disabled={!copyDate}
                                 >
-                                    Cancelar
+                                    {t('cancel')}
                                 </button>
                                 <button
                                     type="button"
@@ -249,7 +245,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                                     onClick={handleCopy}
                                     disabled={!canCopy || copying}
                                 >
-                                    📋 {copying ? 'Copiando...' : 'Copiar'}
+                                    📋 {copying ? t('copying') : t('copy')}
                                 </button>
                             </div>
                         </div>
@@ -260,11 +256,11 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                 <div className="modal__footer">
                     {isEditing && (
                         <button type="button" className="btn btn--danger" onClick={onDelete}>
-                            Eliminar
+                            {t('delete')}
                         </button>
                     )}
                     <button type="button" className="btn btn--outline" onClick={onClose}>
-                        Cancelar
+                        {t('cancel')}
                     </button>
                     <button
                         type="button"
@@ -272,7 +268,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                         onClick={handleSave}
                         disabled={!canSave || saving}
                     >
-                        {saving ? 'Guardando...' : 'Guardar'}
+                        {saving ? t('saving') : t('save')}
                     </button>
                 </div>
             </div>

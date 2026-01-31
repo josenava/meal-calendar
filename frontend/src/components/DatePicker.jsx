@@ -1,11 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-
-// Spanish weekdays starting Monday
-const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']
-const MONTHS = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+import { useTranslation } from '../i18n/LanguageContext'
 
 function getDaysInMonth(year, month) {
     return new Date(year, month + 1, 0).getDate()
@@ -31,6 +25,10 @@ function parseDate(dateStr) {
 }
 
 export default function DatePicker({ selectedDate, onSelect, onClose }) {
+    const { t } = useTranslation()
+    const weekdaysMini = t('weekdaysMini')
+    const months = t('months')
+    
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -139,7 +137,7 @@ export default function DatePicker({ selectedDate, onSelect, onClose }) {
                     </button>
                 </div>
                 <span className="date-picker__month">
-                    {MONTHS[viewMonth]} {viewYear}
+                    {months[viewMonth]} {viewYear}
                 </span>
                 <div className="date-picker__nav">
                     <button
@@ -153,7 +151,7 @@ export default function DatePicker({ selectedDate, onSelect, onClose }) {
             </div>
 
             <div className="date-picker__weekdays">
-                {WEEKDAYS.map((day) => (
+                {weekdaysMini.map((day) => (
                     <div key={day} className="date-picker__weekday">{day}</div>
                 ))}
             </div>

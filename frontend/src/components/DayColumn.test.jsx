@@ -2,7 +2,8 @@
  * Tests for the DayColumn component
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithI18n } from '../test/test-utils'
 import DayColumn from './DayColumn'
 
 describe('DayColumn', () => {
@@ -24,7 +25,7 @@ describe('DayColumn', () => {
     it('should render day header with weekday and date', () => {
         const date = new Date('2024-01-15') // Monday
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}
@@ -32,23 +33,23 @@ describe('DayColumn', () => {
             />
         )
         
-        expect(screen.getByText('LUN')).toBeInTheDocument()
+        expect(screen.getByText('MON')).toBeInTheDocument()
         expect(screen.getByText('15')).toBeInTheDocument()
     })
 
     it('should display correct weekday labels', () => {
         const weekDates = [
-            { date: new Date('2024-01-15'), label: 'LUN' },
-            { date: new Date('2024-01-16'), label: 'MAR' },
-            { date: new Date('2024-01-17'), label: 'MIÉ' },
-            { date: new Date('2024-01-18'), label: 'JUE' },
-            { date: new Date('2024-01-19'), label: 'VIE' },
-            { date: new Date('2024-01-20'), label: 'SÁB' },
-            { date: new Date('2024-01-21'), label: 'DOM' },
+            { date: new Date('2024-01-15'), label: 'MON' },
+            { date: new Date('2024-01-16'), label: 'TUE' },
+            { date: new Date('2024-01-17'), label: 'WED' },
+            { date: new Date('2024-01-18'), label: 'THU' },
+            { date: new Date('2024-01-19'), label: 'FRI' },
+            { date: new Date('2024-01-20'), label: 'SAT' },
+            { date: new Date('2024-01-21'), label: 'SUN' },
         ]
 
         weekDates.forEach(({ date, label }) => {
-            const { unmount } = render(
+            const { unmount } = renderWithI18n(
                 <DayColumn 
                     date={date}
                     getMealFor={mockGetMealFor}
@@ -63,7 +64,7 @@ describe('DayColumn', () => {
     it('should highlight today with special class', () => {
         const today = new Date('2024-01-15') // Same as mocked system time
         
-        const { container } = render(
+        const { container } = renderWithI18n(
             <DayColumn 
                 date={today}
                 getMealFor={mockGetMealFor}
@@ -78,7 +79,7 @@ describe('DayColumn', () => {
     it('should not highlight non-today days', () => {
         const notToday = new Date('2024-01-16') // Different from mocked system time
         
-        const { container } = render(
+        const { container } = renderWithI18n(
             <DayColumn 
                 date={notToday}
                 getMealFor={mockGetMealFor}
@@ -93,7 +94,7 @@ describe('DayColumn', () => {
     it('should render 3 meal slots (breakfast, lunch, dinner)', () => {
         const date = new Date('2024-01-15')
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}
@@ -108,7 +109,7 @@ describe('DayColumn', () => {
     it('should call getMealFor for each meal type', () => {
         const date = new Date('2024-01-15')
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}
@@ -125,7 +126,7 @@ describe('DayColumn', () => {
     it('should call onSlotClick with correct parameters when meal slot is clicked', () => {
         const date = new Date('2024-01-15')
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}
@@ -149,7 +150,7 @@ describe('DayColumn', () => {
             return null
         })
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}
@@ -173,7 +174,7 @@ describe('DayColumn', () => {
             return null
         })
         
-        render(
+        renderWithI18n(
             <DayColumn 
                 date={date}
                 getMealFor={mockGetMealFor}

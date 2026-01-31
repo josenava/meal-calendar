@@ -1,10 +1,10 @@
-const MEAL_LABELS = {
-    breakfast: 'Desayuno',
-    lunch: 'Almuerzo',
-    dinner: 'Cena'
-}
+import { useTranslation } from '../i18n/LanguageContext'
 
 export default function MealSlot({ mealType, meal, onClick }) {
+    const { t } = useTranslation()
+    const mealLabels = t('meals')
+    const mealLabel = mealLabels[mealType]
+    
     const isEmpty = !meal
     const ingredients = meal?.ingredients || []
 
@@ -19,11 +19,11 @@ export default function MealSlot({ mealType, meal, onClick }) {
             {isEmpty ? (
                 <>
                     <span className="meal-slot__add-icon">+</span>
-                    <span className="meal-slot__add-text">Añadir {MEAL_LABELS[mealType]}</span>
+                    <span className="meal-slot__add-text">{t('addMeal', { mealType: mealLabel })}</span>
                 </>
             ) : (
                 <>
-                    <div className="meal-slot__type">{MEAL_LABELS[mealType]}</div>
+                    <div className="meal-slot__type">{mealLabel}</div>
                     <div className="meal-slot__name">{meal.name}</div>
                     {ingredients.length > 0 && (
                         <div className="chips">

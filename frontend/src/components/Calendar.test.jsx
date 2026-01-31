@@ -2,7 +2,8 @@
  * Tests for the Calendar component
  */
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import { renderWithI18n } from '../test/test-utils'
 import Calendar from './Calendar'
 
 describe('Calendar', () => {
@@ -29,7 +30,7 @@ describe('Calendar', () => {
     it('should render 7 day columns', () => {
         const weekDays = createWeekDays('2024-01-15') // Monday
         
-        render(
+        renderWithI18n(
             <Calendar 
                 weekDays={weekDays}
                 getMealFor={mockGetMealFor}
@@ -49,7 +50,7 @@ describe('Calendar', () => {
     it('should display correct day numbers', () => {
         const weekDays = createWeekDays('2024-01-15') // Monday Jan 15
         
-        render(
+        renderWithI18n(
             <Calendar 
                 weekDays={weekDays}
                 getMealFor={mockGetMealFor}
@@ -70,7 +71,7 @@ describe('Calendar', () => {
     it('should call getMealFor for each day and meal type', () => {
         const weekDays = createWeekDays('2024-01-15')
         
-        render(
+        renderWithI18n(
             <Calendar 
                 weekDays={weekDays}
                 getMealFor={mockGetMealFor}
@@ -93,7 +94,7 @@ describe('Calendar', () => {
             return null
         })
         
-        render(
+        renderWithI18n(
             <Calendar 
                 weekDays={weekDays}
                 getMealFor={mockGetMealFor}
@@ -108,7 +109,7 @@ describe('Calendar', () => {
     it('should render 21 meal slots (3 per day)', () => {
         const weekDays = createWeekDays('2024-01-15')
         
-        render(
+        renderWithI18n(
             <Calendar 
                 weekDays={weekDays}
                 getMealFor={mockGetMealFor}

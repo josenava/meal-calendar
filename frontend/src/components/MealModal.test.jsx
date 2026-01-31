@@ -2,7 +2,8 @@
  * Tests for the MealModal component
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithI18n } from '../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import MealModal from './MealModal'
 
@@ -23,19 +24,19 @@ describe('MealModal', () => {
 
     describe('ingredients input', () => {
         it('should render ingredients input field', () => {
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            expect(screen.getByLabelText('Ingredientes')).toBeInTheDocument()
-            expect(screen.getByPlaceholderText('Añadir ingrediente...')).toBeInTheDocument()
+            expect(screen.getByLabelText('Ingredients')).toBeInTheDocument()
+            expect(screen.getByPlaceholderText('Add ingredient...')).toBeInTheDocument()
         })
 
         it('should add ingredient when clicking Add button', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'flour')
-            await user.click(screen.getByRole('button', { name: 'Añadir' }))
+            await user.click(screen.getByRole('button', { name: 'Add' }))
             
             expect(screen.getByText('flour')).toBeInTheDocument()
             expect(input).toHaveValue('')
@@ -43,9 +44,9 @@ describe('MealModal', () => {
 
         it('should add ingredient when pressing Enter', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'eggs{Enter}')
             
             expect(screen.getByText('eggs')).toBeInTheDocument()
@@ -53,9 +54,9 @@ describe('MealModal', () => {
 
         it('should add ingredient when pressing comma', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'milk,')
             
             expect(screen.getByText('milk')).toBeInTheDocument()
@@ -63,23 +64,23 @@ describe('MealModal', () => {
 
         it('should remove ingredient when clicking remove button', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'flour{Enter}')
             
             expect(screen.getByText('flour')).toBeInTheDocument()
             
-            await user.click(screen.getByRole('button', { name: 'Eliminar flour' }))
+            await user.click(screen.getByRole('button', { name: 'Remove flour' }))
             
             expect(screen.queryByText('flour')).not.toBeInTheDocument()
         })
 
         it('should not add duplicate ingredients', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'flour{Enter}')
             await user.type(input, 'flour{Enter}')
             
@@ -89,11 +90,11 @@ describe('MealModal', () => {
 
         it('should show ingredient count', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
             expect(screen.getByText('0/10')).toBeInTheDocument()
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             await user.type(input, 'flour{Enter}')
             
             expect(screen.getByText('1/10')).toBeInTheDocument()
@@ -101,9 +102,9 @@ describe('MealModal', () => {
 
         it('should disable input when max ingredients reached', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            const input = screen.getByPlaceholderText('Añadir ingrediente...')
+            const input = screen.getByPlaceholderText('Add ingredient...')
             
             // Add 10 ingredients
             for (let i = 1; i <= 10; i++) {
@@ -123,7 +124,7 @@ describe('MealModal', () => {
                 ingredients: ['flour', 'eggs', 'milk']
             }
             
-            render(<MealModal {...defaultProps} meal={mealWithIngredients} />)
+            renderWithI18n(<MealModal {...defaultProps} meal={mealWithIngredients} />)
             
             expect(screen.getByText('flour')).toBeInTheDocument()
             expect(screen.getByText('eggs')).toBeInTheDocument()
@@ -134,19 +135,19 @@ describe('MealModal', () => {
         it('should pass ingredients to onSave', async () => {
             const user = userEvent.setup()
             const onSave = vi.fn()
-            render(<MealModal {...defaultProps} onSave={onSave} />)
+            renderWithI18n(<MealModal {...defaultProps} onSave={onSave} />)
             
             // Add meal name
-            const nameInput = screen.getByLabelText('Nombre de la comida')
+            const nameInput = screen.getByLabelText('Meal name')
             await user.type(nameInput, 'Pancakes')
             
             // Add ingredients
-            const ingredientInput = screen.getByPlaceholderText('Añadir ingrediente...')
+            const ingredientInput = screen.getByPlaceholderText('Add ingredient...')
             await user.type(ingredientInput, 'flour{Enter}')
             await user.type(ingredientInput, 'eggs{Enter}')
             
             // Save
-            await user.click(screen.getByRole('button', { name: 'Guardar' }))
+            await user.click(screen.getByRole('button', { name: 'Save' }))
             
             expect(onSave).toHaveBeenCalledWith('Pancakes', ['flour', 'eggs'])
         })
@@ -154,25 +155,25 @@ describe('MealModal', () => {
 
     describe('create mode', () => {
         it('should render create mode correctly', () => {
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            expect(screen.getByText('Añadir Desayuno')).toBeInTheDocument()
-            expect(screen.getByText('Guardar')).toBeInTheDocument()
+            expect(screen.getByText('Add Breakfast')).toBeInTheDocument()
+            expect(screen.getByText('Save')).toBeInTheDocument()
         })
 
         it('should disable save button when name is empty', () => {
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            expect(screen.getByRole('button', { name: 'Guardar' })).toBeDisabled()
+            expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
         })
 
         it('should enable save button when name is provided', async () => {
             const user = userEvent.setup()
-            render(<MealModal {...defaultProps} />)
+            renderWithI18n(<MealModal {...defaultProps} />)
             
-            await user.type(screen.getByLabelText('Nombre de la comida'), 'Pancakes')
+            await user.type(screen.getByLabelText('Meal name'), 'Pancakes')
             
-            expect(screen.getByRole('button', { name: 'Guardar' })).not.toBeDisabled()
+            expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled()
         })
     })
 
@@ -186,17 +187,17 @@ describe('MealModal', () => {
         }
 
         it('should render edit mode correctly', () => {
-            render(<MealModal {...defaultProps} meal={existingMeal} />)
+            renderWithI18n(<MealModal {...defaultProps} meal={existingMeal} />)
             
-            expect(screen.getByText('Editar Desayuno')).toBeInTheDocument()
+            expect(screen.getByText('Edit Breakfast')).toBeInTheDocument()
             expect(screen.getByDisplayValue('Pancakes')).toBeInTheDocument()
-            expect(screen.getByRole('button', { name: 'Eliminar' })).toBeInTheDocument()
+            expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()
         })
 
         it('should show copy section in edit mode', () => {
-            render(<MealModal {...defaultProps} meal={existingMeal} />)
+            renderWithI18n(<MealModal {...defaultProps} meal={existingMeal} />)
             
-            expect(screen.getByText(/Copiar a otro día/)).toBeInTheDocument()
+            expect(screen.getByText(/Copy to another day/)).toBeInTheDocument()
         })
     })
 })

@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import Calendar from './components/Calendar'
 import MealModal from './components/MealModal'
 import Toast from './components/Toast'
+import LanguageSwitcher from './components/LanguageSwitcher'
+import { useTranslation } from './i18n/LanguageContext'
 import { getMeals, createMeal, updateMeal, deleteMeal, copyMeal } from './api/meals'
 
 // Helper functions for date manipulation
@@ -30,14 +32,15 @@ function formatDate(date) {
     return `${year}-${month}-${day}`
 }
 
-function formatDateRange(start, end) {
+function formatDateRange(start, end, locale) {
     const options = { month: 'short', day: 'numeric' }
-    const startStr = start.toLocaleDateString('en-US', options)
-    const endStr = end.toLocaleDateString('en-US', { ...options, year: 'numeric' })
+    const startStr = start.toLocaleDateString(locale, options)
+    const endStr = end.toLocaleDateString(locale, { ...options, year: 'numeric' })
     return `${startStr} - ${endStr}`
 }
 
 export default function App() {
+    const { t } = useTranslation()
     const [currentDate, setCurrentDate] = useState(() => new Date())
     const [meals, setMeals] = useState([])
     const [loading, setLoading] = useState(true)
@@ -57,11 +60,11 @@ export default function App() {
             setError(null)
         } catch (err) {
             setError(err.message)
-            showToast('Error al cargar las comidas', 'error')
+            showToast(t('errorLoadingMeals'), 'error')
         } finally {
             setLoading(false)
         }
-    }, [weekStart.getTime(), weekEnd.getTime()])
+    }, [weekStart.getTime(), weekEnd.getTime(), t])
 
     useEffect(() => {
         fetchMeals()
@@ -107,7 +110,7 @@ export default function App() {
             if (modalData.meal) {
                 // Update existing
                 await updateMeal(modalData.meal.id, { name, ingredients })
-                showToast('¡Comida actualizada!')
+                showToast(t('mealUpdated'))
             } else {
                 // Create new
                 await createMeal({
@@ -116,7 +119,7 @@ export default function App() {
                     name,
                     ingredients
                 })
-                showToast('¡Comida añadida!')
+                showToast(t('mealAdded'))
             }
             closeModal()
             fetchMeals()
@@ -131,7 +134,7 @@ export default function App() {
 
         try {
             await deleteMeal(modalData.meal.id)
-            showToast('¡Comida eliminada!')
+            showToast(t('mealDeleted'))
             closeModal()
             fetchMeals()
         } catch (err) {
@@ -145,7 +148,7 @@ export default function App() {
 
         try {
             await copyMeal(modalData.meal.id, targetDate, targetMealType)
-            showToast('¡Comida copiada!')
+            showToast(t('mealCopied'))
             fetchMeals()
         } catch (err) {
             showToast(err.message, 'error')
@@ -175,29 +178,30 @@ export default function App() {
                     </svg>
                 </div>
                 <div>
-                    <h1 className="header__title">Meal Planner</h1>
-                    <p className="header__subtitle">Plan your weekly meals with ease</p>
+                    <h1 className="header__title">{t('appTitle')}</h1>
+                    <p className="header__subtitle">{t('appSubtitle')}</p>
                 </div>
+                <LanguageSwitcher />
             </header>
 
             {/* Calendar Navigation */}
             <nav className="calendar-nav">
                 <div className="calendar-nav__arrows">
-                    <button className="calendar-nav__btn" onClick={goToPreviousWeek} aria-label="Previous week">
+                    <button className="calendar-nav__btn" onClick={goToPreviousWeek} aria-label={t('previousWeek')}>
                         ‹
                     </button>
-                    <button className="calendar-nav__btn" onClick={goToNextWeek} aria-label="Next week">
+                    <button className="calendar-nav__btn" onClick={goToNextWeek} aria-label={t('nextWeek')}>
                         ›
                     </button>
                 </div>
-                <span className="calendar-nav__date">{formatDateRange(weekStart, weekEnd)}</span>
+                <span className="calendar-nav__date">{formatDateRange(weekStart, weekEnd, t('dateLocale'))}</span>
             </nav>
 
             {/* Calendar */}
             {loading ? (
                 <div className="loading">
                     <div className="loading__spinner"></div>
-                    Loading...
+                    {t('loading')}
                 </div>
             ) : (
                 <Calendar

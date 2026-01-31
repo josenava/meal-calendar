@@ -1,6 +1,6 @@
 import MealSlot from './MealSlot'
+import { useTranslation } from '../i18n/LanguageContext'
 
-const WEEKDAYS = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM']
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner']
 
 function isToday(date) {
@@ -17,6 +17,9 @@ function formatDate(date) {
 }
 
 export default function DayColumn({ date, getMealFor, onSlotClick }) {
+    const { t } = useTranslation()
+    const weekdaysShort = t('weekdaysShort')
+    
     const dayOfWeek = date.getDay()
     const weekdayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Convert to Monday-first
     const today = isToday(date)
@@ -25,7 +28,7 @@ export default function DayColumn({ date, getMealFor, onSlotClick }) {
     return (
         <div className="day-column">
             <div className={`day-column__header ${today ? 'day-column__header--today' : ''}`}>
-                <div className="day-column__weekday">{WEEKDAYS[weekdayIndex]}</div>
+                <div className="day-column__weekday">{weekdaysShort[weekdayIndex]}</div>
                 <div className="day-column__date">{date.getDate()}</div>
             </div>
 

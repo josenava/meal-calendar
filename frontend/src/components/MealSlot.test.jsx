@@ -2,7 +2,8 @@
  * Tests for the MealSlot component
  */
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithI18n } from '../test/test-utils'
 import MealSlot from './MealSlot'
 
 describe('MealSlot', () => {
@@ -14,7 +15,7 @@ describe('MealSlot', () => {
 
     describe('empty slot', () => {
         it('should render empty state correctly', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
@@ -23,11 +24,11 @@ describe('MealSlot', () => {
             )
             
             expect(screen.getByText('+')).toBeInTheDocument()
-            expect(screen.getByText('Añadir Desayuno')).toBeInTheDocument()
+            expect(screen.getByText('Add Breakfast')).toBeInTheDocument()
         })
 
         it('should have empty class when no meal', () => {
-            const { container } = render(
+            const { container } = renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
@@ -39,16 +40,16 @@ describe('MealSlot', () => {
         })
 
         it('should show correct label for each meal type', () => {
-            const { rerender } = render(
+            const { rerender } = renderWithI18n(
                 <MealSlot mealType="breakfast" meal={null} onClick={mockOnClick} />
             )
-            expect(screen.getByText('Añadir Desayuno')).toBeInTheDocument()
+            expect(screen.getByText('Add Breakfast')).toBeInTheDocument()
 
             rerender(<MealSlot mealType="lunch" meal={null} onClick={mockOnClick} />)
-            expect(screen.getByText('Añadir Almuerzo')).toBeInTheDocument()
+            expect(screen.getByText('Add Lunch')).toBeInTheDocument()
 
             rerender(<MealSlot mealType="dinner" meal={null} onClick={mockOnClick} />)
-            expect(screen.getByText('Añadir Cena')).toBeInTheDocument()
+            expect(screen.getByText('Add Dinner')).toBeInTheDocument()
         })
     })
 
@@ -61,7 +62,7 @@ describe('MealSlot', () => {
         }
 
         it('should render meal name', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={mockMeal} 
@@ -70,11 +71,11 @@ describe('MealSlot', () => {
             )
             
             expect(screen.getByText('Pancakes')).toBeInTheDocument()
-            expect(screen.getByText('Desayuno')).toBeInTheDocument()
+            expect(screen.getByText('Breakfast')).toBeInTheDocument()
         })
 
         it('should not have empty class when meal exists', () => {
-            const { container } = render(
+            const { container } = renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={mockMeal} 
@@ -90,7 +91,7 @@ describe('MealSlot', () => {
                 ...mockMeal,
                 ingredients: ['flour', 'eggs', 'milk']
             }
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={mealWithIngredients} 
@@ -104,7 +105,7 @@ describe('MealSlot', () => {
         })
 
         it('should not render chips container when no ingredients', () => {
-            const { container } = render(
+            const { container } = renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={mockMeal} 
@@ -120,7 +121,7 @@ describe('MealSlot', () => {
                 ...mockMeal,
                 ingredients: []
             }
-            const { container } = render(
+            const { container } = renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={mealWithEmptyIngredients} 
@@ -134,7 +135,7 @@ describe('MealSlot', () => {
 
     describe('interactions', () => {
         it('should call onClick when clicked', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
@@ -148,7 +149,7 @@ describe('MealSlot', () => {
         })
 
         it('should call onClick when Enter key is pressed', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
@@ -162,7 +163,7 @@ describe('MealSlot', () => {
         })
 
         it('should not call onClick for other keys', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
@@ -176,7 +177,7 @@ describe('MealSlot', () => {
         })
 
         it('should be focusable', () => {
-            render(
+            renderWithI18n(
                 <MealSlot 
                     mealType="breakfast" 
                     meal={null} 
