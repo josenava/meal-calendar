@@ -88,3 +88,41 @@ export async function searchMealsByIngredient(ingredient) {
     }
     return response.json();
 }
+
+/**
+ * Swap two meals (exchange their dates and meal types)
+ */
+export async function swapMeals(mealId1, mealId2) {
+    const response = await fetch(`${API_BASE}/meals/swap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            meal_id_1: mealId1,
+            meal_id_2: mealId2
+        })
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to swap meals');
+    }
+    return response.json();
+}
+
+/**
+ * Move a meal to a different date/meal type
+ */
+export async function moveMeal(mealId, targetDate, targetMealType) {
+    const response = await fetch(`${API_BASE}/meals/${mealId}/move`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            target_date: targetDate,
+            target_meal_type: targetMealType
+        })
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to move meal');
+    }
+    return response.json();
+}
