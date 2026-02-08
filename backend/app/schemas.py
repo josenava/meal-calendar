@@ -44,6 +44,8 @@ class MealCreate(MealBase):
 
 class MealUpdate(BaseModel):
     """Schema for updating an existing meal."""
+    date: date
+    meal_type: MealType
     name: str
     ingredients: list[str] = []
     
@@ -62,6 +64,18 @@ class MealUpdate(BaseModel):
 
 class MealCopy(BaseModel):
     """Schema for copying a meal to another date/type."""
+    target_date: date
+    target_meal_type: MealType
+
+
+class MealSwap(BaseModel):
+    """Schema for swapping two meals."""
+    meal_id_1: int
+    meal_id_2: int
+
+
+class MealMove(BaseModel):
+    """Schema for moving a meal to a different slot."""
     target_date: date
     target_meal_type: MealType
 

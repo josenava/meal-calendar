@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Meal
-from ..schemas import MealCopy, MealCreate, MealResponse, MealUpdate
+from ..schemas import MealCopy, MealCreate, MealMove, MealResponse, MealSwap, MealUpdate
 
 router = APIRouter(prefix="/api/meals", tags=["meals"])
 
@@ -82,10 +82,21 @@ def update_meal(meal_id: int, meal: MealUpdate, db: Session = Depends(get_db)):
     if not db_meal:
         raise HTTPException(status_code=404, detail="Meal not found")
     
+    db_meal.date = meal.date
+    db_meal.meal_type = meal.meal_type
     db_meal.name = meal.name
     db_meal.ingredients = meal.ingredients
-    db.commit()
-    db.refresh(db_meal)
+    
+    try:
+        db.commit()
+        db.refresh(db_meal)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail=f"A meal already exists for {meal.date} - {meal.meal_type}"
+        ) from None
+        
     return db_meal
 
 
@@ -128,3 +139,66 @@ def copy_meal(meal_id: int, copy_data: MealCopy, db: Session = Depends(get_db)):
         ) from None
 
     return new_meal
+
+
+@router.post("/swap", response_model=list[MealResponse])
+def swap_meals(swap_data: MealSwap, db: Session = Depends(get_db)):
+    """Swap dates and meal types between two meals."""
+    if swap_data.meal_id_1 == swap_data.meal_id_2:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot swap a meal with itself"
+        )
+
+    meal_1 = db.query(Meal).filter(Meal.id == swap_data.meal_id_1).first()
+    meal_2 = db.query(Meal).filter(Meal.id == swap_data.meal_id_2).first()
+
+    if not meal_1:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Meal with id {swap_data.meal_id_1} not found"
+        )
+    if not meal_2:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Meal with id {swap_data.meal_id_2} not found"
+        )
+
+    # Swap names and ingredients (content stays in original slots)
+    meal_1.name, meal_2.name = meal_2.name, meal_1.name
+    meal_1.ingredients, meal_2.ingredients = meal_2.ingredients, meal_1.ingredients
+
+    db.commit()
+    db.refresh(meal_1)
+    db.refresh(meal_2)
+
+    return [meal_1, meal_2]
+
+
+@router.patch("/{meal_id}/move", response_model=MealResponse)
+def move_meal(meal_id: int, move_data: MealMove, db: Session = Depends(get_db)):
+    """Move a meal to a different date and/or meal type."""
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+
+    # Check if target slot is already occupied
+    existing = db.query(Meal).filter(
+        Meal.date == move_data.target_date,
+        Meal.meal_type == move_data.target_meal_type
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail=f"A meal already exists for {move_data.target_date} - {move_data.target_meal_type}"
+        )
+
+    # Move the meal to the new slot
+    meal.date = move_data.target_date
+    meal.meal_type = move_data.target_meal_type
+
+    db.commit()
+    db.refresh(meal)
+
+    return meal

@@ -1,6 +1,6 @@
 import DayColumn from './DayColumn'
 
-export default function Calendar({ weekDays, getMealFor, onSlotClick }) {
+export default function Calendar({ weekDays, getMealFor, onSlotClick, onSwap }) {
     return (
         <main className="calendar">
             <div className="calendar__grid">
@@ -10,6 +10,7 @@ export default function Calendar({ weekDays, getMealFor, onSlotClick }) {
                         date={day}
                         getMealFor={getMealFor}
                         onSlotClick={onSlotClick}
+                        onSwap={onSwap}
                     />
                 ))}
             </div>

@@ -15,7 +15,8 @@ const MAX_INGREDIENTS = 10
 export default function MealModal({ date, mealType, meal, onClose, onSave, onDelete, onCopy }) {
     const { t } = useTranslation()
     const mealLabels = t('meals')
-    
+
+    const [currentType, setCurrentType] = useState(mealType)
     const [name, setName] = useState(meal?.name || '')
     const [ingredients, setIngredients] = useState(meal?.ingredients || [])
     const [ingredientInput, setIngredientInput] = useState('')
@@ -99,7 +100,7 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
     const handleSave = async () => {
         if (!canSave) return
         setSaving(true)
-        await onSave(name.trim(), ingredients)
+        await onSave(name.trim(), ingredients, date, currentType)
         setSaving(false)
     }
 
@@ -150,6 +151,24 @@ export default function MealModal({ date, mealType, meal, onClose, onSave, onDel
                             placeholder={t('mealNamePlaceholder')}
                             autoFocus
                         />
+                    </div>
+
+                    {/* Meal Type Selection */}
+                    <div className="form-group">
+                        <label className="form-label">{t('mealType')}</label>
+                        <div className="type-selector">
+                            {MEAL_TYPES.map((type) => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    className={`type-selector__btn ${currentType === type ? 'type-selector__btn--active' : ''}`}
+                                    onClick={() => setCurrentType(type)}
+                                >
+                                    <span className="type-selector__emoji">{MEAL_EMOJIS[type]}</span>
+                                    <span className="type-selector__label">{mealLabels[type]}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Ingredients */}

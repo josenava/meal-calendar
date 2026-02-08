@@ -131,30 +131,51 @@ class TestMealUpdate:
 
     def test_valid_meal_update(self):
         """Test creating a valid update schema."""
-        update = MealUpdate(name="Updated Pancakes")
+        update = MealUpdate(
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            name="Updated Pancakes"
+        )
         assert update.name == "Updated Pancakes"
         assert update.ingredients == []
 
     def test_valid_meal_update_with_ingredients(self):
         """Test updating meal with ingredients."""
-        update = MealUpdate(name="Pancakes", ingredients=["flour", "eggs"])
+        update = MealUpdate(
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            name="Pancakes",
+            ingredients=["flour", "eggs"]
+        )
         assert update.name == "Pancakes"
         assert update.ingredients == ["flour", "eggs"]
 
     def test_meal_update_strips_ingredient_whitespace(self):
         """Test that ingredient whitespace is stripped in update."""
-        update = MealUpdate(name="Pancakes", ingredients=["  flour  ", "eggs"])
+        update = MealUpdate(
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            name="Pancakes",
+            ingredients=["  flour  ", "eggs"]
+        )
         assert update.ingredients == ["flour", "eggs"]
 
     def test_meal_update_filters_empty_ingredients(self):
         """Test that empty ingredients are filtered in update."""
-        update = MealUpdate(name="Pancakes", ingredients=["flour", "", "eggs"])
+        update = MealUpdate(
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            name="Pancakes",
+            ingredients=["flour", "", "eggs"]
+        )
         assert update.ingredients == ["flour", "eggs"]
 
     def test_meal_update_max_ingredients_limit(self):
         """Test that exceeding max ingredients raises validation error in update."""
         with pytest.raises(ValidationError) as exc_info:
             MealUpdate(
+                date=date(2024, 1, 15),
+                meal_type="breakfast",
                 name="Pancakes",
                 ingredients=[f"ingredient{i}" for i in range(MAX_INGREDIENTS + 1)]
             )
@@ -162,19 +183,31 @@ class TestMealUpdate:
 
     def test_meal_update_strips_whitespace(self):
         """Test that name whitespace is stripped."""
-        update = MealUpdate(name="  Waffles  ")
+        update = MealUpdate(
+            date=date(2024, 1, 15),
+            meal_type="breakfast",
+            name="  Waffles  "
+        )
         assert update.name == "Waffles"
 
     def test_meal_update_empty_name_fails(self):
         """Test that empty name raises validation error."""
         with pytest.raises(ValidationError) as exc_info:
-            MealUpdate(name="")
+            MealUpdate(
+                date=date(2024, 1, 15),
+                meal_type="breakfast",
+                name=""
+            )
         assert "Name cannot be empty" in str(exc_info.value)
 
     def test_meal_update_whitespace_name_fails(self):
         """Test that whitespace-only name raises validation error."""
         with pytest.raises(ValidationError) as exc_info:
-            MealUpdate(name="   ")
+            MealUpdate(
+                date=date(2024, 1, 15),
+                meal_type="breakfast",
+                name="   "
+            )
         assert "Name cannot be empty" in str(exc_info.value)
 
 

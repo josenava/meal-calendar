@@ -4,7 +4,7 @@ import MealModal from './components/MealModal'
 import Toast from './components/Toast'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import { useTranslation } from './i18n/LanguageContext'
-import { getMeals, createMeal, updateMeal, deleteMeal, copyMeal } from './api/meals'
+import { getMeals, createMeal, updateMeal, deleteMeal, copyMeal, swapMeals, moveMeal } from './api/meals'
 
 // Helper functions for date manipulation
 function getWeekStart(date) {
@@ -103,19 +103,26 @@ export default function App() {
     }
 
     // Save meal (create or update)
-    const handleSaveMeal = async (name, ingredients = []) => {
+    const handleSaveMeal = async (name, ingredients, date, mealType) => {
+        const targetDate = date || modalData.date
+        const targetMealType = mealType || modalData.mealType
         if (!modalData) return
 
         try {
             if (modalData.meal) {
                 // Update existing
-                await updateMeal(modalData.meal.id, { name, ingredients })
+                await updateMeal(modalData.meal.id, {
+                    date: targetDate,
+                    meal_type: targetMealType,
+                    name,
+                    ingredients
+                })
                 showToast(t('mealUpdated'))
             } else {
                 // Create new
                 await createMeal({
-                    date: modalData.date,
-                    meal_type: modalData.mealType,
+                    date: targetDate,
+                    meal_type: targetMealType,
                     name,
                     ingredients
                 })
@@ -149,6 +156,26 @@ export default function App() {
         try {
             await copyMeal(modalData.meal.id, targetDate, targetMealType)
             showToast(t('mealCopied'))
+            fetchMeals()
+        } catch (err) {
+            showToast(err.message, 'error')
+        }
+    }
+
+    // Swap or move meals via drag and drop
+    const handleSwapMeals = async (sourceMealId, targetMealId, targetDate, targetMealType) => {
+        if (!sourceMealId) return
+
+        try {
+            if (targetMealId) {
+                // Both slots have meals - swap content
+                await swapMeals(sourceMealId, targetMealId)
+                showToast(t('mealsSwapped'))
+            } else {
+                // Target slot is empty - move the meal
+                await moveMeal(sourceMealId, targetDate, targetMealType)
+                showToast(t('mealMoved'))
+            }
             fetchMeals()
         } catch (err) {
             showToast(err.message, 'error')
@@ -208,6 +235,7 @@ export default function App() {
                     weekDays={weekDays}
                     getMealFor={getMealFor}
                     onSlotClick={openModal}
+                    onSwap={handleSwapMeals}
                 />
             )}
 

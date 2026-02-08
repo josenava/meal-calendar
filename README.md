@@ -24,10 +24,12 @@ open http://localhost:5175
 
 ### Backend (FastAPI)
 
+Requires [uv](https://docs.astral.sh/uv/) for dependency management.
+
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+uv sync
+uv run uvicorn app.main:app --reload
 ```
 
 ### Frontend (React + Vite)
@@ -45,5 +47,5 @@ npm run dev
 ## Tech Stack
 
 - **Frontend**: React 18, Vite, Vanilla CSS
-- **Backend**: FastAPI, SQLAlchemy, SQLite
+- **Backend**: FastAPI, SQLAlchemy, SQLite, uv
 - **Deployment**: Docker, Nginx
